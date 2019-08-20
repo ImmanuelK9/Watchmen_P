@@ -1,0 +1,10 @@
+pwm.pbi: \
+  D:\Studium\WS1920\TCC\CE4057--master\CE4057--master\Source_Code_CE4057\Software\CPU\LuminaryMicro\DriverLib\driverlib\pwm.c \
+  D:\Studium\WS1920\TCC\CE4057--master\CE4057--master\Source_Code_CE4057\Software\EvalBoards\TI\LM3S9B92-EVALBOT\IAR\uCOS-III-CE4053_PG\..\..\..\..\..\CPU\LuminaryMicro\DriverLib\inc/hw_ints.h \
+  D:\Studium\WS1920\TCC\CE4057--master\CE4057--master\Source_Code_CE4057\Software\EvalBoards\TI\LM3S9B92-EVALBOT\IAR\uCOS-III-CE4053_PG\..\..\..\..\..\CPU\LuminaryMicro\DriverLib\inc/hw_memmap.h \
+  D:\Studium\WS1920\TCC\CE4057--master\CE4057--master\Source_Code_CE4057\Software\EvalBoards\TI\LM3S9B92-EVALBOT\IAR\uCOS-III-CE4053_PG\..\..\..\..\..\CPU\LuminaryMicro\DriverLib\inc/hw_pwm.h \
+  D:\Studium\WS1920\TCC\CE4057--master\CE4057--master\Source_Code_CE4057\Software\EvalBoards\TI\LM3S9B92-EVALBOT\IAR\uCOS-III-CE4053_PG\..\..\..\..\..\CPU\LuminaryMicro\DriverLib\inc/hw_sysctl.h \
+  D:\Studium\WS1920\TCC\CE4057--master\CE4057--master\Source_Code_CE4057\Software\EvalBoards\TI\LM3S9B92-EVALBOT\IAR\uCOS-III-CE4053_PG\..\..\..\..\..\CPU\LuminaryMicro\DriverLib\inc/hw_types.h \
+  D:\Studium\WS1920\TCC\CE4057--master\CE4057--master\Source_Code_CE4057\Software\EvalBoards\TI\LM3S9B92-EVALBOT\IAR\uCOS-III-CE4053_PG\..\..\..\..\..\CPU\LuminaryMicro\DriverLib\driverlib/debug.h \
+  D:\Studium\WS1920\TCC\CE4057--master\CE4057--master\Source_Code_CE4057\Software\EvalBoards\TI\LM3S9B92-EVALBOT\IAR\uCOS-III-CE4053_PG\..\..\..\..\..\CPU\LuminaryMicro\DriverLib\driverlib/interrupt.h \
+  D:\Studium\WS1920\TCC\CE4057--master\CE4057--master\Source_Code_CE4057\Software\EvalBoards\TI\LM3S9B92-EVALBOT\IAR\uCOS-III-CE4053_PG\..\..\..\..\..\CPU\LuminaryMicro\DriverLib\driverlib/pwm.h
