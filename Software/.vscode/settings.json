@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "includes.h": "c",
+        "lib_rbtree.h": "c"
+    }
+}
