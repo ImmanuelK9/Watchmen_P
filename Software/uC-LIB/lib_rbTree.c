@@ -48,9 +48,38 @@ Node*   getSibling      (Node* p_n);
 Node*   getUncle        (Node* p_n);
 Node*   rotLeft         (Node* p_n);
 Node*   rotRight        (Node* p_n);
+void	insertRec		(Node* p_root, Node* p_n);
+void	repairTree		(Node* p_n);
+
+CPU_INT08S	cmpKey		(Node* p_a, Node* p_b);
 
 /*********************************************************************************************************
 *                                     LOCAL CONFIGURATION ERRORS
+*********************************************************************************************************/
+
+/*********************************************************************************************************
+*                                           insert()
+*
+* Description : (1) insert a node into the tree
+*
+* Argument(s) : p_root  pointer to root of the tree
+*               p_n     pointer to node that should be inserted
+*
+* Return(s)   : A pointer to the (new) root of the tree
+*********************************************************************************************************/
+Node* insert    (Node *p_root, Node *p_n){
+	insertRec(p_root, p_n);
+	repairTree(p_n);
+
+	//find the new root of the tree
+	p_root = p_n;
+	while(0 != p_root->parent) p_root = p_root->parent;
+	return p_root;
+}
+
+/*_______________________________________________________________________________________________________
+*********************************************************************************************************
+*                                           LOCAL FUNCTIONS
 *********************************************************************************************************/
 
 /*********************************************************************************************************
@@ -163,4 +192,113 @@ Node*   rotRight    (Node* p_n){
     }
 
     p_l->parent = p_p;
+}
+
+/*********************************************************************************************************
+*                                           insertRec()
+*
+* Description : (1) insert a node into the tree recursively
+*				(2) helper function for insert()
+*
+* Argument(s) : p_root  pointer to root of the tree
+*               p_n     pointer to node that should be inserted
+*
+* Note(s)     : (1) tree property: left_child <= root
+*				(2) the inserting node doesnt have to be initialized beforehands except of the key
+*********************************************************************************************************/
+void insertRec	(Node* p_root, Node* p_n){
+	// descend the tree to a leaf
+	if(0 != p_root){
+		if(cmpKey(p_n, p_root) <= 0){
+			if(0 == p_root->left) p_root->left = p_n;
+			else{
+				insertRec(p_root->left, p_n);
+				return;
+			}
+		} else {
+			if(0 == p_root->right) p_root->right = p_n;
+			else{
+				insertRec(p_root->right, p_n);
+				return;
+			}
+		}
+	}
+
+	p_n->parent = p_root;
+	p_n->color = RED;
+	p_n->left = 0;
+	p_n->right = 0;
+}
+
+/*********************************************************************************************************
+*                                           repairTree()
+*
+* Description : (1) restore the RBTree properties after a node has been inserted
+*
+* Argument(s) : p_n		pointer to node that has been inserted
+*
+* Note(s)     : (a) There are different cases that can occur
+*					(0) N was inserted into an empty tree / N is the root node / n has no parent
+*					(1) N's parent P is black
+*					(2) N's parent P is red => P is not the root => P has a parent
+*						(2a) N's uncle is red
+*						(2b) N's uncle is black or null
+*							(2bI) if n is "on the inside" of the subtree
+*							(2bII)if n is "on the outside" of the subtree
+*********************************************************************************************************/
+void repairTree	(Node* p_n){
+	if(0 == p_n->parent) p_n->color = BLACK;
+	else if(p_n->parent->color == BLACK) return;
+	else if(0 != getUncle(p_n) && RED == getUncle(p_n)->color){
+		//case (2a)
+		p_n->parent->color = BLACK;
+		getUncle(p_n)->color = BLACK;
+		getGrandParent(p_n)->color = RED;
+		repairTree(getGrandParent(p_n));
+	} else {
+		//case (2b)
+		Node* p_p = p_n->parent;
+		Node* p_g = getGrandParent(p_n);
+		
+		//case (2bI)
+		//if n is "on the inside" of the subtree under G move it to the "outside"
+		if(p_n == p_p->right && p_p == p_g->left){
+			rotLeft(p_p);
+			p_n = p_n->left;	
+			//this renaming leads to the state as if n was already
+			//on the "outside" before calling repairTree
+		} else if(p_n == p_p->left && p_p == p_g->right){
+			rotRight(p_p);
+			p_n = p_n->right;
+		}
+
+		//case (2bII)
+		//proceed as if N was already on the "outside"
+		//parents and grandparents could have changed during 
+		p_p = p_n->parent;
+		p_g = getGrandParent(p_n);
+
+		if(p_n == p_p->left) rotRight(p_g);
+		else rotLeft(p_g);
+
+		p_p->color = BLACK;
+		p_g->color = RED;
+	}
+}
+
+/*********************************************************************************************************
+*                                           cmpKey()
+*
+* Description : (1) compares the keys of two nodes
+*
+* Argument(s) : p_a/b     pointer to the first/second node
+*
+* Return(s)   : (1) -1 if a<b	| 0 if a==b	| 1 if a>b
+*
+* Note(s)     : (a) assuming 0!=p_a and 0!=p_b
+*********************************************************************************************************/
+CPU_INT08S	cmpKey		(Node* p_a, Node* p_b){
+	if(p_a->key < p_b->key) return -1;
+	if(p_a->key > p_b->key) return 1;
+	return 0;
 }
