@@ -4,7 +4,7 @@
 *
 *                                            RED BLACK TREES
 *
-* Filename      : lib_rbTree.h
+* Filename      : lib_rbTree.c
 * Version       : ?
 * Programmer(s) : Watchmen_T
 *
