@@ -1,48 +1,31 @@
-/*
-*********************************************************************************************************
+/*********************************************************************************************************
 *                                                uC/LIB
 *                                        CUSTOM LIBRARY MODULES
-*
 *
 *                                            RED BLACK TREES
 *
 * Filename      : lib_rbTree.h
 * Version       : ?
 * Programmer(s) : Watchmen_T
-*********************************************************************************************************
-* Note(s) : none
 *
+* Note(s) : (1) compare https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
 *********************************************************************************************************/
 
 
-/*********************************************************************************************************
-*                                            INCLUDE FILES
-*********************************************************************************************************/
+/********************************************INCLUDE FILES***********************************************/
 #include "lib_rbTree.h"
 
-/*********************************************************************************************************
-*                                            LOCAL DEFINES
-*********************************************************************************************************/
+/********************************************LOCAL DEFINES***********************************************/
 
-/*********************************************************************************************************
-*                                           LOCAL CONSTANTS
-*********************************************************************************************************/
+/*******************************************LOCAL CONSTANTS**********************************************/
 
-/*********************************************************************************************************
-*                                          LOCAL DATA TYPES
-*********************************************************************************************************/
+/******************************************LOCAL DATA TYPES**********************************************/
 
-/*********************************************************************************************************
-*                                            LOCAL TABLES
-*********************************************************************************************************/
+/********************************************LOCAL TABLES************************************************/
 
-/*********************************************************************************************************
-*                                       LOCAL GLOBAL VARIABLES
-*********************************************************************************************************/
+/***************************************LOCAL GLOBAL VARIABLES*******************************************/
 
-/*********************************************************************************************************
-*                                      LOCAL FUNCTION PROTOTYPES
-*********************************************************************************************************/
+/**************************************LOCAL FUNCTION PROTOTYPES*****************************************/
 Node*   getGrandParent  (Node* p_n);
 Node*   getSibling      (Node* p_n);
 Node*   getUncle        (Node* p_n);
@@ -53,20 +36,14 @@ void	repairTree		(Node* p_n);
 
 CPU_INT08S	cmpKey		(Node* p_a, Node* p_b);
 
-/*********************************************************************************************************
-*                                     LOCAL CONFIGURATION ERRORS
-*********************************************************************************************************/
+/*************************************LOCAL CONFIGURATION ERRORS*****************************************/
 
-/*********************************************************************************************************
-*                                           insert()
-*
-* Description : (1) insert a node into the tree
-*
-* Argument(s) : p_root  pointer to root of the tree
-*               p_n     pointer to node that should be inserted
-*
-* Return(s)   : A pointer to the (new) root of the tree
-*********************************************************************************************************/
+/********************************************insert()*****************************************************
+ * Description : (1) insert a node into the tree
+ * Argument(s) : p_root  pointer to root of the tree
+ *               p_n     pointer to node that should be inserted
+ * Return(s)   : A pointer to the (new) root of the tree
+ *********************************************************************************************************/
 Node* insert    (Node *p_root, Node *p_n){
 	insertRec(p_root, p_n);
 	repairTree(p_n);
@@ -77,23 +54,15 @@ Node* insert    (Node *p_root, Node *p_n){
 	return p_root;
 }
 
-/*_______________________________________________________________________________________________________
-*********************************************************************************************************
-*                                           LOCAL FUNCTIONS
-*********************************************************************************************************/
+/*********************************************LOCAL FUNCTIONS*******************************************/
 
-/*********************************************************************************************************
-*                                           getGrandParent()
-*
-* Description : (1) get grandparent of node
-*
-* Argument(s) : p_n     pointer to node under inspection
-*
-* Return(s)   : A pointer to the grandparent
-*
-* Note(s)     : (a) returns null if n is the root node
-*               (b) returns null if the parent of n is the root node
-*********************************************************************************************************/
+/******************************************* getGrandParent() *******************************************       
+ * Description : (1) get grandparent of node
+ * Argument(s) : p_n     pointer to node under inspection
+ * Return(s)   : A pointer to the grandparent
+ * Note(s)     : (a) returns null if n is the root node
+ *               (b) returns null if the parent of n is the root node
+ *********************************************************************************************************/
 Node*   getGrandParent  (Node* p_n){
     Node* p_p = p_n->parent;
 
@@ -101,13 +70,11 @@ Node*   getGrandParent  (Node* p_n){
     return p_p->parent;
 }
 
-/*********************************************************************************************************
-*                                           getSibling()
-*
-* Note(s)     : (1) returns null if there is no sibling, i.e.
-*                   (a) n has no parent
-*                   (b) n's parent has only one child (that is n)
-*********************************************************************************************************/
+/********************************************getSibling()************************************************
+ * Note(s)     : (1) returns null if there is no sibling, i.e.
+ *                   (a) n has no parent
+ *                   (b) n's parent has only one child (that is n)
+ ******************************************************************************************************/
 Node*   getSibling  (Node* p_n){
     Node* p_p = p_n->parent;
 
@@ -116,13 +83,11 @@ Node*   getSibling  (Node* p_n){
     else                    return p_p->left;
 }
 
-/*********************************************************************************************************
-*                                           getUncle()
-*
-* Note(s)     : (1) returns null if there is no uncle, e.g.
-*                   (a) n has no parent
-*                   (b) n has no grandparent
-*********************************************************************************************************/
+/*******************************************getUncle()*************************************************
+ * Note(s)     : (1) returns null if there is no uncle, e.g.
+ *                   (a) n has no parent
+ *                   (b) n has no grandparent
+ ******************************************************************************************************/
 Node*   getUncle    (Node* p_n){
     Node* p_p = p_n->parent;
     
@@ -130,18 +95,15 @@ Node*   getUncle    (Node* p_n){
     return getSibling(p_p);
 }
 
-/*********************************************************************************************************
-*                                           rotLeft()
-*
-* Description : (1) rotate the right child to the node's position
-*                       N                R
-*                      / \      =>      / \
-*                     a   R            N   c
-*                        / \          / \
-*                       b   c        a   b 
-*
-* Argument(s) : p_n     pointer to the left child that is going to be rotated
-*********************************************************************************************************/
+/********************************************rotLeft()***************************************************
+ * Description : (1) rotate the right child to the node's position
+ *                       N                R
+ *                      / \      =>      / \
+ *                     a   R            N   c
+ *                        / \          / \
+ *                       b   c        a   b 
+ * Argument(s) : p_n     pointer to the left child that is going to be rotated
+ ******************************************************************************************************/
 Node*   rotLeft     (Node* p_n){
     Node* p_p = p_n->parent;
     Node* p_r = p_n->right;
@@ -162,18 +124,15 @@ Node*   rotLeft     (Node* p_n){
     p_r->parent = p_p;
 }
 
-/*********************************************************************************************************
-*                                           rotRight()
-*
-* Description : (1) rotate the left child to the node's position
-*                       N                L
-*                      / \      =>      / \
-*                     L   c            a   N
-*                    / \                  / \
-*                   a   b                b   c
-*
-* Argument(s) : p_n     pointer to the left child that is going to be rotated
-*********************************************************************************************************/
+/********************************************rotRight()****************************************************
+ * Description : (1) rotate the left child to the node's position
+ *                       N                L
+ *                      / \      =>      / \
+ *                     L   c            a   N
+ *                    / \                  / \
+ *                   a   b                b   c
+ * Argument(s) : p_n     pointer to the left child that is going to be rotated
+ *********************************************************************************************************/
 Node*   rotRight    (Node* p_n){
     Node* p_p = p_n->parent;
     Node* p_l = p_n->left;
@@ -194,18 +153,14 @@ Node*   rotRight    (Node* p_n){
     p_l->parent = p_p;
 }
 
-/*********************************************************************************************************
-*                                           insertRec()
-*
-* Description : (1) insert a node into the tree recursively
-*				(2) helper function for insert()
-*
-* Argument(s) : p_root  pointer to root of the tree
-*               p_n     pointer to node that should be inserted
-*
-* Note(s)     : (1) tree property: left_child <= root
-*				(2) the inserting node doesnt have to be initialized beforehands except of the key
-*********************************************************************************************************/
+/********************************************insertRec()*************************************************
+ * Description : (1) insert a node into the tree recursively
+ *				 (2) helper function for insert()
+ * Argument(s) : p_root  pointer to root of the tree
+ *               p_n     pointer to node that should be inserted
+ * Note(s)     : (1) tree property: left_child <= root
+ *				 (2) the inserting node doesnt have to be initialized beforehands except of the key
+ *********************************************************************************************************/
 void insertRec	(Node* p_root, Node* p_n){
 	// descend the tree to a leaf
 	if(0 != p_root){
@@ -230,22 +185,18 @@ void insertRec	(Node* p_root, Node* p_n){
 	p_n->right = 0;
 }
 
-/*********************************************************************************************************
-*                                           repairTree()
-*
-* Description : (1) restore the RBTree properties after a node has been inserted
-*
-* Argument(s) : p_n		pointer to node that has been inserted
-*
-* Note(s)     : (a) There are different cases that can occur
-*					(0) N was inserted into an empty tree / N is the root node / n has no parent
-*					(1) N's parent P is black
-*					(2) N's parent P is red => P is not the root => P has a parent
-*						(2a) N's uncle is red
-*						(2b) N's uncle is black or null
-*							(2bI) if n is "on the inside" of the subtree
-*							(2bII)if n is "on the outside" of the subtree
-*********************************************************************************************************/
+/********************************************repairTree()************************************************
+ * Description : (1) restore the RBTree properties after a node has been inserted
+ * Argument(s) : p_n		pointer to node that has been inserted
+ * Note(s)     : (a) There are different cases that can occur
+ *					(0) N was inserted into an empty tree / N is the root node / n has no parent
+ *					(1) N's parent P is black
+ *					(2) N's parent P is red => P is not the root => P has a parent
+ *						(2a) N's uncle is red
+ *						(2b) N's uncle is black or null
+ *							(2bI) if n is "on the inside" of the subtree
+ *							(2bII)if n is "on the outside" of the subtree
+ *********************************************************************************************************/
 void repairTree	(Node* p_n){
 	if(0 == p_n->parent) p_n->color = BLACK;
 	else if(p_n->parent->color == BLACK) return;
@@ -286,17 +237,11 @@ void repairTree	(Node* p_n){
 	}
 }
 
-/*********************************************************************************************************
-*                                           cmpKey()
-*
-* Description : (1) compares the keys of two nodes
-*
-* Argument(s) : p_a/b     pointer to the first/second node
-*
-* Return(s)   : (1) -1 if a<b	| 0 if a==b	| 1 if a>b
-*
-* Note(s)     : (a) assuming 0!=p_a and 0!=p_b
-*********************************************************************************************************/
+/********************************************cmpKey()******************************************************
+ * Description : (1) compares the keys of two nodes
+ * Argument(s) : p_a/b     pointer to the first/second node
+ * Note(s)     : (a) assuming 0!=p_a and 0!=p_b
+ *********************************************************************************************************/
 CPU_INT08S	cmpKey		(Node* p_a, Node* p_b){
 	if(p_a->key < p_b->key) return -1;
 	if(p_a->key > p_b->key) return 1;
