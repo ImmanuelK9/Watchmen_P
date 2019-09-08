@@ -29,10 +29,12 @@
 Node*   getGrandParent  (Node* p_n);
 Node*   getSibling      (Node* p_n);
 Node*   getUncle        (Node* p_n);
-Node*   rotLeft         (Node* p_n);
-Node*   rotRight        (Node* p_n);
+void	rotLeft         (Node* p_n);
+void	rotRight        (Node* p_n);
 void	insertRec		(Node* p_root, Node* p_n);
 void	repairTree		(Node* p_n);
+void	replaceNode		(Node* p_del, Node* p_new);
+Node*	findMin			(Node* p_n);
 
 CPU_INT08S	cmpKey		(Node* p_a, Node* p_b);
 
@@ -52,6 +54,35 @@ Node* insert    (Node *p_root, Node *p_n){
 	p_root = p_n;
 	while(0 != p_root->parent) p_root = p_root->parent;
 	return p_root;
+}
+
+/********************************************delete()*******************************************************
+ * Description	: delete a node from the tree
+ * Argument(s)	: p_n	pointer to node that should be deleted
+ * Note(s)		: p_n should not be the root of the tree!
+ *********************************************************************************************************/
+void delete (Node *p_n){
+	if(0 != p_n->left && 0 !=p_n->right){
+		//p_n has two childs, replace with its successor
+		Node* p_suc = findMin(p_n->right);
+		p_n->key = p_suc->key;
+		delete(p_suc);
+	} else{
+		//p_n has at most one child
+		Node* p_child = (0 == p_n->right) ? p_n->left : p_n->right;
+		replaceNode(p_n, p_child);
+		if(p_n->color == BLACK){
+			if(p_child==RED) p_child->color=BLACK;
+			else{
+				//p_n was a black "leaf" 
+				//(a leaf in the sense of a binary tree without usage of null-leafs)
+				//TODO
+			}
+		}
+
+
+	}
+	//TODO eventually need to free the memory?
 }
 
 /*********************************************LOCAL FUNCTIONS*******************************************/
@@ -102,9 +133,9 @@ Node*   getUncle    (Node* p_n){
  *                     a   R            N   c
  *                        / \          / \
  *                       b   c        a   b 
- * Argument(s) : p_n     pointer to the left child that is going to be rotated
+ * Argument(s) : p_n     pointer to node which is going to be rotated with its right child
  ******************************************************************************************************/
-Node*   rotLeft     (Node* p_n){
+void   rotLeft     (Node* p_n){
     Node* p_p = p_n->parent;
     Node* p_r = p_n->right;
     // 0 != p_r must be true because we cannot make a leaf an internal node
@@ -131,9 +162,9 @@ Node*   rotLeft     (Node* p_n){
  *                     L   c            a   N
  *                    / \                  / \
  *                   a   b                b   c
- * Argument(s) : p_n     pointer to the left child that is going to be rotated
+ * Argument(s) : p_n     pointer to node which is going to be rotated with its left child
  *********************************************************************************************************/
-Node*   rotRight    (Node* p_n){
+void   rotRight    (Node* p_n){
     Node* p_p = p_n->parent;
     Node* p_l = p_n->left;
     // 0 != p_l must be true because we cannot make a leaf an internal node
@@ -235,6 +266,32 @@ void repairTree	(Node* p_n){
 		p_p->color = BLACK;
 		p_g->color = RED;
 	}
+}
+
+/********************************************replaceNode()**********************************************
+ * Description : (1) replaces a node with another new node
+ * Argument(s) : p_del	pointer to the node to be deleted and replaced
+ *               p_new	pointer to the new node
+ * Note(s)     : (1) p_del == 0 is not allowed
+ * 				 (2) p_del should not be the root of the tree!
+ * 				 (3) p_new == 0 is allowed
+ *********************************************************************************************************/
+void replaceNode (Node* p_del, Node* p_new){
+	if(0 != p_new) p_new->parent = p_del->parent;
+	if(p_del == p_del->parent->left){
+		p_del->parent->left = p_new;
+	} else {
+		p_del->parent->right = p_new;
+	}
+}
+
+/********************************************findMin()*************************************************
+ * Description : (1) finds the minimum for a given node
+ * Argument(s) : p_n	node from where to start the search
+ *********************************************************************************************************/
+Node* findMin (Node* p_n){
+	while(0 != p_n->left) p_n = p_n->left;
+	return p_n;
 }
 
 /********************************************cmpKey()******************************************************
