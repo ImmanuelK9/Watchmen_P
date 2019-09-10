@@ -40,8 +40,6 @@ void	helpDelete123	(Node* p_n);
 void	helpDelete4		(Node* p_n);
 void	helpDelete56	(Node* p_n);
 
-CPU_INT08S	cmpKey		(Node* p_a, Node* p_b);
-
 /*************************************LOCAL CONFIGURATION ERRORS*****************************************/
 
 /********************************************insert()*****************************************************
@@ -93,9 +91,21 @@ void delete (Node *p_n){
 	//TODO eventually need to free the memory of n?
 }
 
+/********************************************cmpKey()******************************************************
+ * Description : (1) compares the keys of two nodes
+ * 				 (2) returns a-b
+ * Argument(s) : p_a/b     pointer to the first/second node
+ * Note(s)     : (a) assuming 0!=p_a and 0!=p_b
+ *********************************************************************************************************/
+CPU_INT08S	cmpKey		(Node* p_a, Node* p_b){
+	if(p_a->key < p_b->key) return -1;
+	if(p_a->key > p_b->key) return 1;
+	return 0;
+}
+
 /*********************************************LOCAL FUNCTIONS*******************************************/
 
-/******************************************* getGrandParent() *******************************************       
+/******************************************* getGrandParent() *******************************************
  * Description : (1) get grandparent of node
  * Argument(s) : p_n     pointer to node under inspection
  * Return(s)   : A pointer to the grandparent
@@ -386,15 +396,4 @@ void	helpDelete56	(Node* p_n){
 		p_s->left->color = BLACK;
 		rotRight(p_n->parent);
   }
-}
-
-/********************************************cmpKey()******************************************************
- * Description : (1) compares the keys of two nodes
- * Argument(s) : p_a/b     pointer to the first/second node
- * Note(s)     : (a) assuming 0!=p_a and 0!=p_b
- *********************************************************************************************************/
-CPU_INT08S	cmpKey		(Node* p_a, Node* p_b){
-	if(p_a->key < p_b->key) return -1;
-	if(p_a->key > p_b->key) return 1;
-	return 0;
 }

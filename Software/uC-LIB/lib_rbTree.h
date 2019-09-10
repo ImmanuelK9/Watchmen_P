@@ -37,6 +37,7 @@ typedef struct node Node;
 /******************************************FUNCTION PROTOTYPES*******************************************/
 Node*       insert              (Node *p_root, Node *p_n);
 void        delete              (Node *p_n);
+CPU_INT08S	cmpKey		        (Node* p_a, Node* p_b);
 
 /***********************************************MODULE END***********************************************/
 #endif

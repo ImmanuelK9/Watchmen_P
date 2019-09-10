@@ -35,6 +35,7 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 #include <os.h>
+#include <test_Tree.h>
 
 /*
 *********************************************************************************************************

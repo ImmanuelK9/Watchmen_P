@@ -32,11 +32,11 @@
                 </option>
                 <option>
                     <name>Input description</name>
-                    <state>Full formatting.</state>
+                    <state>Full formatting, with multibyte support.</state>
                 </option>
                 <option>
                     <name>Output description</name>
-                    <state>Full formatting.</state>
+                    <state>Full formatting, with multibyte support.</state>
                 </option>
                 <option>
                     <name>GOutputBinary</name>
@@ -360,6 +360,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\..\uC-Probe\Target\Communication\Generic\Source</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\uC-Probe\Target\Communication\Generic\RS-232\Source</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\uC-Probe\Target\Communication\Generic\RS-232\Ports\LuminaryMicro\LM3Sxxxx</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\tests</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1015,7 +1016,7 @@
                 </option>
                 <option>
                     <name>IlinkTrustzoneImportLibraryOut</name>
-                    <state>###Unitialized###</state>
+                    <state>uCOS-III-CE4053_PG_import_lib.o</state>
                 </option>
                 <option>
                     <name>OILinkExtraOption</name>
@@ -1678,6 +1679,12 @@
                 <name>$PROJ_DIR$\..\..\..\..\..\CPU\LuminaryMicro\DriverLib\inc\hw_watchdog.h</name>
             </file>
         </group>
+    </group>
+    <group>
+        <name>tests</name>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\tests\test.h</name>
+        </file>
     </group>
     <group>
         <name>uC/CPU</name>
