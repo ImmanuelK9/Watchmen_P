@@ -324,7 +324,7 @@ void	helpDelete123	(Node* p_n){
 			((p_s->left == 0) || (p_s->left->color == BLACK)) && 
 			((p_s->right == 0) || (p_s->right->color == BLACK)) ){
 				p_s->color = RED;
-				helpDelete12(p_n->parent);
+				helpDelete123(p_n->parent);
 		} else{
 			helpDelete4(p_n);
 		}

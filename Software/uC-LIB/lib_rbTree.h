@@ -21,13 +21,14 @@
 enum color {RED, BLACK};
 
 /*********************************************DATA TYPES************************************************/
-typedef struct node {
-    Node        *parent;
-    Node        *left;
-    Node        *right;
+struct node {
+    struct node *parent;
+    struct node *left;
+    struct node *right;
     enum color  color;
     CPU_INT32U  key;
-} Node;
+};
+typedef struct node Node;
 
 /******************************************GLOBAL VARIABLES**********************************************/
 
