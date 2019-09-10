@@ -40,7 +40,7 @@ void    testRBTreeScenario0(Node* a, Node* b){
     //free(b);
 }
 
-void    testRBTreeScenario1(Node* x, CPU_INT32U k){
+Node*   testRBTreeScenario1(Node* x, CPU_INT32U k){
     Node* currentRoot = x;
     x->color = BLACK;
     x->key=15;
@@ -50,6 +50,39 @@ void    testRBTreeScenario1(Node* x, CPU_INT32U k){
     }
     testRBTree(currentRoot);
     //print2D(currentRoot);
+    return currentRoot;
+}
+
+Node*   testRBTreeScenario2(Node* x, CPU_INT32U k){
+    Node* currentRoot = testRBTreeScenario1(x, k);
+    /*currentRoot = deleteNode(x+7);
+    testRBTree(currentRoot);
+    currentRoot = deleteNode(x+10);
+    testRBTree(currentRoot);
+    currentRoot = deleteNode(x+14);
+    testRBTree(currentRoot);
+    currentRoot = deleteNode(x+19);
+    testRBTree(currentRoot);
+    currentRoot = deleteNode(x+8);
+    testRBTree(currentRoot);
+    currentRoot = deleteNode(x+3);
+    testRBTree(currentRoot);
+    currentRoot = deleteNode(x+12);
+    testRBTree(currentRoot);
+    currentRoot = deleteNode(x+13);
+    testRBTree(currentRoot);
+    currentRoot = deleteNode(x+6);
+    testRBTree(currentRoot);*/
+    for(int i=0; i<7; i++){
+      currentRoot = deleteNode(x+i);
+      testRBTree(currentRoot);
+    }
+    print2D(currentRoot);
+    currentRoot = deleteNode(x+7);
+    print2D(currentRoot);
+    testRBTree(currentRoot);
+    print2D(currentRoot);
+    return currentRoot;
 }
 
 void    testRBTree      (Node* p_n){
@@ -57,12 +90,15 @@ void    testRBTree      (Node* p_n){
     testBlackRoot(p_n);
     testNotRedRed(p_n);
     testBlackEqual(p_n);
+    testRelationship(p_n);
     fprintf(stdout, "%s", "Test finished\n");
 }
 
 /******************************************testSearchTree()**********************************************
  * Description	: Tests the binary search tree property for the given RBTree
- * Notes        : Assuming left <= root < right
+ * Notes        : (1) Assuming left <= root <= right
+ *                (2) with arbitrary rotation it is not possible to guarantee
+ *                      strict inequality any side
  *********************************************************************************************************/
 void    testSearchTree  (Node* p_n){
     if(0 != p_n->left){
@@ -70,7 +106,7 @@ void    testSearchTree  (Node* p_n){
         testSearchTree(p_n->left);
     }
     if(0 != p_n->right){
-        if(cmpKey(p_n, p_n->right) >= 0) fprintf(stdout, "%s", "SearchTree error\n");
+        if(cmpKey(p_n, p_n->right) > 0) fprintf(stdout, "%s", "SearchTree error\n");
         testSearchTree(p_n->right);
     }
 }
@@ -97,14 +133,36 @@ int     countBlack(Node* p_n){
     if(p_n == 0) return 0;
     int l = countBlack(p_n->left);
     int r = countBlack(p_n->right);
-    if(l != r) fprintf(stdout, "%s", "countBlack error\n");
+    if(l != r) {
+      fprintf(stdout, "%s", "countBlack error\n");
+    }
     
     if(p_n->color == RED) return l;
-    else return l=1;
+    else return l+1;
 }
 
 void    testBlackEqual  (Node* p_n){
     countBlack(p_n);
+}
+
+void    testRelationship    (Node* p_n){
+    if (p_n==0) return;
+    if(p_n->left != 0){
+        if(p_n->left->parent!=p_n){
+            fprintf(stdout, "%s", "Relationship error\n");
+        }
+        testRelationship(p_n->left);
+    }
+    if(p_n->right != 0){
+        if(p_n->right->parent!=p_n){
+            fprintf(stdout, "%s", "Relationship error\n");
+        }
+        testRelationship(p_n->right);
+    }
+    if(p_n->parent != 0 && p_n->parent->left!=p_n && p_n->parent->right!=p_n){
+        fprintf(stdout, "%s", "Relationship error\n");
+    }
+    
 }
 
 // Function to print binary tree in 2D  

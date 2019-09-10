@@ -39,6 +39,7 @@ Node*	findMin			(Node* p_n);
 void	helpDelete123	(Node* p_n);
 void	helpDelete4		(Node* p_n);
 void	helpDelete56	(Node* p_n);
+Node*	getRoot			(Node* p_n);
 
 /*************************************LOCAL CONFIGURATION ERRORS*****************************************/
 
@@ -53,15 +54,13 @@ Node* insert    (Node *p_root, Node *p_n){
 	repairTree(p_n);
 
 	//find the new root of the tree
-	p_root = p_n;
-	while(0 != p_root->parent) p_root = p_root->parent;
-	return p_root;
+	return getRoot(p_n);
 }
 
-/********************************************delete()*******************************************************
+/*****************************************deleteNode()******************************************************
  * Description	: delete a node from the tree
  * Argument(s)	: p_n	pointer to node that should be deleted
- * Note(s)		: (a) p_n should not be the root of the tree!
+ * Note(s)		: (a) p_n should not be the root of the tree! //TODO
  * 				  (b) there are different cases that can occur
  * 					(b1) n has two children -> replace key with successor's key, delete successor
  * 					(b2) n has at most one children
@@ -73,20 +72,23 @@ Node* insert    (Node *p_root, Node *p_n){
  * 							(+) P - Parent, S - Sibling, S_L/R - Sibling's left/right child
  * 							(+) b - black, r - red, x - black or red
  *********************************************************************************************************/
-void delete (Node *p_n){
+Node* deleteNode (Node *p_n){
 	if(0 != p_n->left && 0 !=p_n->right){
 		// case (b1)
 		Node* p_suc = findMin(p_n->right);
 		p_n->key = p_suc->key;
-		delete(p_suc);
+		return deleteNode(p_suc);
 	} else{
 		// case (b2)
 		Node* p_child = (0 == p_n->right) ? p_n->left : p_n->right;
 		if(p_n->color == BLACK){
-			if(p_child==RED) p_child->color=BLACK;	//case (b2b)
-			else helpDelete123 (p_n);				//case (b2c)
+			//TODO p_child should always be != 0 but it seems that this was a bugfix???
+			if(p_child != 0 && p_child->color==RED) p_child->color=BLACK;	//case (b2b)
+			else helpDelete123(p_n);				//case (b2c)
 		}
+		Node* newRoot = getRoot(p_n);
 		replaceNode(p_n, p_child);
+		return newRoot;
 	}
 	//TODO eventually need to free the memory of n?
 }
@@ -195,8 +197,8 @@ void   rotRight    (Node* p_n){
 
     if( 0 != p_p ){
         //N wasnt the root
-        if(p_n == p_l->left) 		p_p->left = p_l;
-        else if(p_n == p_l->right)	p_p->right = p_l;
+        if(p_n == p_p->left) 		p_p->left = p_l;
+        else if(p_n == p_p->right)	p_p->right = p_l;
     }
 
     p_l->parent = p_p;
@@ -367,14 +369,16 @@ void	helpDelete56	(Node* p_n){
 
 	if(p_s->color == BLACK){
 		if ((p_n == p_n->parent->left) && 
-			(p_s->right->color == BLACK) &&
-			(p_s->left->color == RED)) {
+			//TODO p_s->right should never be == 0 but it seems that this was a bugfix???
+			((p_s->right == 0) || (p_s->right->color == BLACK)) &&
+			(p_s->left->color == RED)){
 				// This last test is trivial too due to cases 2-4.
 				p_s->color = RED;
 				p_s->left->color = BLACK;
 				rotRight(p_s);
     } else if ((p_n == p_n->parent->right) && 
-				(p_s->left->color == BLACK) &&
+				//TODO p_s->left should never be == 0 but it seems that this was a bugfix???
+				((p_s->left == 0) || (p_s->left->color == BLACK)) &&
 				(p_s->right->color == RED)) {
 				// This last test is trivial too due to cases 2-4.
 				p_s->color = RED;
@@ -396,4 +400,14 @@ void	helpDelete56	(Node* p_n){
 		p_s->left->color = BLACK;
 		rotRight(p_n->parent);
   }
+}
+
+/********************************************getRoot()**********************************************
+ * Description	: get the root of the tree including p_n
+ *********************************************************************************************************/
+Node*	getRoot			(Node* p_n){
+	if(p_n == 0) return 0;
+	Node* p_root = p_n;
+	while(0 != p_root->parent) p_root = p_root->parent;
+	return p_root;
 }

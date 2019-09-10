@@ -122,8 +122,8 @@ int  main (void)
     BSP_IntDisAll();                                            /* Disable all interrupts.                              */
     OSInit(&err);                                               /* Init uC/OS-III.                                      */
     //fprintf(stdout, "%#10X\n", a);
-    testRBTreeScenario0(&a, &b);
-	testRBTreeScenario1(x, K);
+    //testRBTreeScenario0(&a, &b);
+	testRBTreeScenario2(x, K);
     //OSTaskCreate((OS_TCB     *)&AppTaskStartTCB,           /* Create the start task                                */
       /*           (CPU_CHAR   *)"App Task Start",
                  (OS_TASK_PTR ) AppTaskStart,
