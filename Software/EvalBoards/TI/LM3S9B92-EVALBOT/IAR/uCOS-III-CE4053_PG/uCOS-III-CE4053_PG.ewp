@@ -1683,7 +1683,10 @@
     <group>
         <name>tests</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\tests\test.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\tests\test_rbTree.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\tests\test_rbTree.h</name>
         </file>
     </group>
     <group>

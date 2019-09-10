@@ -166,8 +166,8 @@ void   rotLeft     (Node* p_n){
 
     if( 0 != p_p ){
         //N wasnt the root
-        if(p_n == p_n->left) p_n->left = p_r;
-        else                 p_n->right = p_r;
+        if(p_n == p_p->left) 		p_p->left = p_r;
+        else if(p_n == p_p->right)	p_p->right = p_r;
     }
 
     p_r->parent = p_p;
@@ -195,8 +195,8 @@ void   rotRight    (Node* p_n){
 
     if( 0 != p_p ){
         //N wasnt the root
-        if(p_n == p_n->left) p_n->left = p_l;
-        else                 p_n->right = p_l;
+        if(p_n == p_l->left) 		p_p->left = p_l;
+        else if(p_n == p_l->right)	p_p->right = p_l;
     }
 
     p_l->parent = p_p;

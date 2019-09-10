@@ -20,10 +20,14 @@
 /***********************************************DEFINES**************************************************/
 
 /******************************************FUNCTION PROTOTYPES*******************************************/
+void    testRBTreeScenario0(Node* a, Node* b);
+void    testRBTreeScenario1(Node* x, CPU_INT32U k);
+void    testRBTree      (Node* p_n);
 void    testSearchTree  (Node* p_n);
 void    testBlackRoot   (Node* p_n);
 void    testNotRedRed   (Node* p_n);
 void    testBlackEqual  (Node* p_n);
+void    print2D         (Node *root);
 
 /***********************************************MODULE END***********************************************/
 #endif
