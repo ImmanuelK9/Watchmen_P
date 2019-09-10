@@ -9,6 +9,7 @@
 * Programmer(s) : Watchmen_T
 *
 * Note(s) : (1) compare https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
+*				https://en.wikipedia.org/w/index.php?title=Red%E2%80%93black_tree&oldid=914471956
 *********************************************************************************************************/
 
 
@@ -35,6 +36,9 @@ void	insertRec		(Node* p_root, Node* p_n);
 void	repairTree		(Node* p_n);
 void	replaceNode		(Node* p_del, Node* p_new);
 Node*	findMin			(Node* p_n);
+void	helpDelete123	(Node* p_n);
+void	helpDelete4		(Node* p_n);
+void	helpDelete56	(Node* p_n);
 
 CPU_INT08S	cmpKey		(Node* p_a, Node* p_b);
 
@@ -59,30 +63,34 @@ Node* insert    (Node *p_root, Node *p_n){
 /********************************************delete()*******************************************************
  * Description	: delete a node from the tree
  * Argument(s)	: p_n	pointer to node that should be deleted
- * Note(s)		: p_n should not be the root of the tree!
+ * Note(s)		: (a) p_n should not be the root of the tree!
+ * 				  (b) there are different cases that can occur
+ * 					(b1) n has two children -> replace key with successor's key, delete successor
+ * 					(b2) n has at most one children
+ * 						(b2a) n is red
+ * 						(b2b) n is black but its child is red
+ * 						(b2c) n is black its "child" is a leaf/nullptr, i.e. n was a black "leaf"
+ * 							  (a leaf in the sense of a binary tree without usage of null-leafs)
+ * 							(+) all helper case descriptions will be of the form P S S_L S_R
+ * 							(+) P - Parent, S - Sibling, S_L/R - Sibling's left/right child
+ * 							(+) b - black, r - red, x - black or red
  *********************************************************************************************************/
 void delete (Node *p_n){
 	if(0 != p_n->left && 0 !=p_n->right){
-		//p_n has two childs, replace with its successor
+		// case (b1)
 		Node* p_suc = findMin(p_n->right);
 		p_n->key = p_suc->key;
 		delete(p_suc);
 	} else{
-		//p_n has at most one child
+		// case (b2)
 		Node* p_child = (0 == p_n->right) ? p_n->left : p_n->right;
-		replaceNode(p_n, p_child);
 		if(p_n->color == BLACK){
-			if(p_child==RED) p_child->color=BLACK;
-			else{
-				//p_n was a black "leaf" 
-				//(a leaf in the sense of a binary tree without usage of null-leafs)
-				//TODO
-			}
+			if(p_child==RED) p_child->color=BLACK;	//case (b2b)
+			else helpDelete123 (p_n);				//case (b2c)
 		}
-
-
+		replaceNode(p_n, p_child);
 	}
-	//TODO eventually need to free the memory?
+	//TODO eventually need to free the memory of n?
 }
 
 /*********************************************LOCAL FUNCTIONS*******************************************/
@@ -292,6 +300,92 @@ void replaceNode (Node* p_del, Node* p_new){
 Node* findMin (Node* p_n){
 	while(0 != p_n->left) p_n = p_n->left;
 	return p_n;
+}
+
+/********************************************helpDelete123()**********************************************
+ * Description	: cases (b2c1), (b2c2): b r x x and (b2c3): b b b b of the deleting function
+ *********************************************************************************************************/
+void	helpDelete123	(Node* p_n){
+	if(0 == p_n->parent){
+		// case (b2c1) n is the new root
+		// nothing to do
+	} else {
+		//case (b2c2): b r x x
+		Node* p_s = getSibling(p_n);
+		if(p_s->color == RED){
+			p_n->parent->color = RED;
+			p_s->color = BLACK;
+			if(p_n == p_n->parent->left) rotLeft(p_n->parent);
+			else rotRight(p_n->parent);
+		}
+		//case (b2c3): b b b b
+		p_s = getSibling(p_n);
+		if((p_n->parent->color == BLACK) && (p_s->color == BLACK) &&
+			((p_s->left == 0) || (p_s->left->color == BLACK)) && 
+			((p_s->right == 0) || (p_s->right->color == BLACK)) ){
+				p_s->color = RED;
+				helpDelete12(p_n->parent);
+		} else{
+			helpDelete4(p_n);
+		}
+	}
+}
+
+/********************************************helpDelete4()**********************************************
+ * Description	: case (b2c4): r b b b of the deleting function
+ *********************************************************************************************************/
+void	helpDelete4		(Node* p_n){
+	//case (b2c4): r b b b
+	Node* p_s = getSibling(p_n);
+
+	if((p_n->parent->color == RED) && (p_s->color == BLACK) &&
+		((p_s->left == 0) || (p_s->left->color == BLACK)) && 
+		((p_s->right == 0) || (p_s->right->color == BLACK)) ){
+			p_s->color = RED;
+			p_n->parent->color = BLACK;
+	} else {
+		helpDelete56(p_n);
+	}
+}
+
+/********************************************helpDelete56()**********************************************
+ * Description	: cases (b2c5): x b r b and (b2c6): x b x r of the deleting function
+ *********************************************************************************************************/
+void	helpDelete56	(Node* p_n){
+	//case (b2c5): x b r b
+	Node* p_s = getSibling(p_n);
+
+	if(p_s->color == BLACK){
+		if ((p_n == p_n->parent->left) && 
+			(p_s->right->color == BLACK) &&
+			(p_s->left->color == RED)) {
+				// This last test is trivial too due to cases 2-4.
+				p_s->color = RED;
+				p_s->left->color = BLACK;
+				rotRight(p_s);
+    } else if ((p_n == p_n->parent->right) && 
+				(p_s->left->color == BLACK) &&
+				(p_s->right->color == RED)) {
+				// This last test is trivial too due to cases 2-4.
+				p_s->color = RED;
+				p_s->right->color = BLACK;
+				rotLeft(p_s);
+		}
+	}
+	
+	//case (b2c6): x b x r
+	p_s = getSibling(p_n);
+
+	p_s->color = p_n->parent->color;
+	p_n->parent->color = BLACK;
+
+	if (p_n == p_n->parent->left) {
+		p_s->right->color = BLACK;
+		rotLeft(p_n->parent);
+	} else {
+		p_s->left->color = BLACK;
+		rotRight(p_n->parent);
+  }
 }
 
 /********************************************cmpKey()******************************************************
