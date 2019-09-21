@@ -1695,6 +1695,33 @@ OS_SEM_CTR    OS_TaskSemPost            (OS_TCB                *p_tcb,
 
 /*$PAGE*/
 /* ================================================================================================================== */
+/*                                            RECURSIVE TASK MANAGEMENT                                                    */
+/* ================================================================================================================== */
+void          OSRecTaskCreate			(OS_TCB                *p_tcb,
+                                         CPU_CHAR              *p_name,
+                                         OS_TASK_PTR            p_task,
+                                         void                  *p_arg,
+                                         OS_PRIO                prio,
+                                         CPU_STK               *p_stk_base,
+                                         CPU_STK_SIZE           stk_limit,
+                                         CPU_STK_SIZE           stk_size,
+                                         OS_MSG_QTY             q_size,
+                                         OS_TICK                time_quanta,
+                                         void                  *p_ext,
+                                         OS_OPT                 opt,
+                                         OS_ERR                *p_err
+										 //additional data for recursion
+										 
+										 );
+
+void          OSRecTaskFinish           (OS_TCB                *p_tcb,
+                                         OS_ERR                *p_err);
+
+/* ------------------------------------------------ INTERNAL FUNCTIONS ---------------------------------------------- */
+
+
+/*$PAGE*/
+/* ================================================================================================================== */
 /*                                                 TIME MANAGEMENT                                                    */
 /* ================================================================================================================== */
 
