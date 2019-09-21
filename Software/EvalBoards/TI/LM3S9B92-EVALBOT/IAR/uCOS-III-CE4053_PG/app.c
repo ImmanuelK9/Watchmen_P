@@ -35,6 +35,7 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 #include <os.h>
+#include <test_rbTree.h>
 
 /*
 *********************************************************************************************************
@@ -80,6 +81,11 @@ CPU_INT32U      iCounter= 1;
 CPU_INT32U      iMove   = 10;
 CPU_INT32U      measure=0;
 
+#define		K	20
+Node			a;
+Node			b;
+Node			x[K];
+
 
 /*
 *********************************************************************************************************
@@ -115,9 +121,11 @@ int  main (void)
 
     BSP_IntDisAll();                                            /* Disable all interrupts.                              */
     OSInit(&err);                                               /* Init uC/OS-III.                                      */
-
-    OSTaskCreate((OS_TCB     *)&AppTaskStartTCB,           /* Create the start task                                */
-                 (CPU_CHAR   *)"App Task Start",
+    //fprintf(stdout, "%#10X\n", a);
+    //testRBTreeScenario0(&a, &b);
+	testRBTreeScenario2(x, K);
+    //OSTaskCreate((OS_TCB     *)&AppTaskStartTCB,           /* Create the start task                                */
+      /*           (CPU_CHAR   *)"App Task Start",
                  (OS_TASK_PTR ) AppTaskStart,
                  (void       *) 0,
                  (OS_PRIO     ) APP_TASK_START_PRIO,
@@ -128,7 +136,7 @@ int  main (void)
                  (OS_TICK     ) 0u,
                  (void       *) (CPU_INT32U) 0, 
                  (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
-                 (OS_ERR     *)&err);
+                 (OS_ERR     *)&err);*/
 
     OSStart(&err);                                              /* Start multitasking (i.e. give control to uC/OS-III). */
 }
