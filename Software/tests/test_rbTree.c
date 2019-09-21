@@ -73,15 +73,14 @@ Node*   testRBTreeScenario2(Node* x, CPU_INT32U k){
     testRBTree(currentRoot);
     currentRoot = deleteNode(x+6);
     testRBTree(currentRoot);*/
-    for(int i=0; i<7; i++){
+    for(int i=0; i<k; i++){
       currentRoot = deleteNode(x+i);
       testRBTree(currentRoot);
     }
     print2D(currentRoot);
-    currentRoot = deleteNode(x+7);
+    currentRoot = deleteNode(x+k);
     print2D(currentRoot);
     testRBTree(currentRoot);
-    print2D(currentRoot);
     return currentRoot;
 }
 
@@ -101,22 +100,24 @@ void    testRBTree      (Node* p_n){
  *                      strict inequality any side
  *********************************************************************************************************/
 void    testSearchTree  (Node* p_n){
-    if(0 != p_n->left){
-        if(cmpKey(p_n, p_n->left) < 0) fprintf(stdout, "%s", "SearchTree error\n");
-        testSearchTree(p_n->left);
-    }
-    if(0 != p_n->right){
-        if(cmpKey(p_n, p_n->right) > 0) fprintf(stdout, "%s", "SearchTree error\n");
-        testSearchTree(p_n->right);
+    if(p_n != 0){
+        if(0 != p_n->left){
+            if(cmpKey(p_n, p_n->left) < 0) fprintf(stdout, "%s", "SearchTree error\n");
+            testSearchTree(p_n->left);
+        }
+        if(0 != p_n->right){
+            if(cmpKey(p_n, p_n->right) > 0) fprintf(stdout, "%s", "SearchTree error\n");
+            testSearchTree(p_n->right);
+        }
     }
 }
 
 void    testBlackRoot   (Node* p_n){
-    if(p_n->color == RED) fprintf(stdout, "%s", "BlackRoot error\n");
+    if(p_n!=0 && p_n->color == RED) fprintf(stdout, "%s", "BlackRoot error\n");
 }
 
 void    testNotRedRed   (Node* p_n){
-    if(p_n->color == RED){
+    if(p_n != 0 && p_n->color == RED){
         if(0 != p_n->left){
             if(p_n->left->color == RED) fprintf(stdout, "%s", "NotRedRed error\n");
             testNotRedRed(p_n->left);
