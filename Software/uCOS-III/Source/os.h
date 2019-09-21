@@ -62,6 +62,7 @@ extern "C" {
 #include <lib_def.h>
 #include <os_type.h>
 #include <os_cpu.h>
+#include <lib_rbTree.h>
 
 
 /*
@@ -637,6 +638,8 @@ typedef  struct  os_tcb              OS_TCB;
 
 typedef  struct  os_rdy_list         OS_RDY_LIST;
 
+typedef  struct  os_rec_list_key	 OS_REC_LIST_KEY;
+
 typedef  struct  os_tick_spoke       OS_TICK_SPOKE;
 
 typedef  void                      (*OS_TMR_CALLBACK_PTR)(void *p_tmr, void *p_arg);
@@ -691,6 +694,18 @@ struct  os_rdy_list {
     OS_TCB              *HeadPtr;                           /* Pointer to task that will run at selected priority     */
     OS_TCB              *TailPtr;                           /* Pointer to last task          at selected priority     */
     OS_OBJ_QTY           NbrEntries;                        /* Number of entries             at selected priority     */
+};
+
+
+/*
+------------------------------------------------------------------------------------------------------------------------
+*                                                 	RECURSION LIST
+------------------------------------------------------------------------------------------------------------------------
+*/
+struct os_rec_list_key {
+	CPU_INT32U			TickCtrMatch;						/* Absolute time when task is going to be ready         */
+	OS_TCB				*tcbPtr;							/* pointer to TCB assosiacted with this node			*/
+	CPU_INT32U			period;								/* period of this periodic task							*/	
 };
 
 
@@ -1114,6 +1129,7 @@ OS_EXT            OS_OBJ_QTY             OSQQty;                      /* Number 
 
                                                                       /* READY LIST --------------------------------- */
 OS_EXT            OS_RDY_LIST            OSRdyList[OS_CFG_PRIO_MAX];  /* Table of tasks ready to run                  */
+OS_EXT			  Node					*OSRecList;
 
 
 #ifdef OS_SAFETY_CRITICAL_IEC61508
@@ -1709,16 +1725,16 @@ void          OSRecTaskCreate			(OS_TCB                *p_tcb,
                                          OS_TICK                time_quanta,
                                          void                  *p_ext,
                                          OS_OPT                 opt,
-                                         OS_ERR                *p_err
+                                         OS_ERR                *p_err,
 										 //additional data for recursion
-										 
+										 CPU_INT32U				period	
 										 );
 
 void          OSRecTaskFinish           (OS_TCB                *p_tcb,
                                          OS_ERR                *p_err);
 
 /* ------------------------------------------------ INTERNAL FUNCTIONS ---------------------------------------------- */
-
+void		OSRecTaskListUpdate			(void);
 
 /*$PAGE*/
 /* ================================================================================================================== */

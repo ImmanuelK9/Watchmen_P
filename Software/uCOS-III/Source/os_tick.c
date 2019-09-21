@@ -498,6 +498,12 @@ void  OS_TickListUpdate (void)
             done  = DEF_TRUE;
         }
     }
+    //TODO Where exactly should this be done? inside the critical section?
+    // After the timing measurements?
+    
+    // periodic task processing
+    OSRecTaskListUpdate();
+
     ts_end = OS_TS_GET() - ts_start;                                   /* Measure execution time of tick task         */
     if (ts_end > OSTickTaskTimeMax) {
         OSTickTaskTimeMax = ts_end;

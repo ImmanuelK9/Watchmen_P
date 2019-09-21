@@ -16,6 +16,7 @@
 
 /********************************************INCLUDE FILES**********************************************/
 #include <cpu.h>       // for the data types
+#include <os.h>        // for specific key
 
 /***********************************************DEFINES*************************************************/
 enum color {RED, BLACK};
@@ -26,7 +27,7 @@ struct node {
     struct node *left;
     struct node *right;
     enum color  color;
-    CPU_INT32U  key;
+    OS_REC_LIST_KEY  *key;
 };
 typedef struct node Node;
 
@@ -37,6 +38,7 @@ typedef struct node Node;
 /******************************************FUNCTION PROTOTYPES*******************************************/
 Node*       insert              (Node *p_root, Node *p_n);
 Node*       deleteNode          (Node *p_n);
+Node*	    findMin			    (Node* p_n);
 CPU_INT08S	cmpKey		        (Node* p_a, Node* p_b);
 
 /***********************************************MODULE END***********************************************/

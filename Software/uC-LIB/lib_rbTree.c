@@ -35,7 +35,6 @@ void	rotRight        (Node* p_n);
 void	insertRec		(Node* p_root, Node* p_n);
 void	repairTree		(Node* p_n);
 void	replaceNode		(Node* p_del, Node* p_new);
-Node*	findMin			(Node* p_n);
 void	helpDelete123	(Node* p_n);
 void	helpDelete4		(Node* p_n);
 void	helpDelete56	(Node* p_n);
@@ -98,6 +97,15 @@ Node* deleteNode (Node *p_n){
 	//TODO eventually need to free the memory of n?
 }
 
+/********************************************findMin()*************************************************
+ * Description : (1) finds the minimum for a given node
+ * Argument(s) : p_n	node from where to start the search
+ *********************************************************************************************************/
+Node* findMin (Node* p_n){
+    while(0 != p_n->left) p_n = p_n->left;
+	return p_n;
+}
+
 /********************************************cmpKey()******************************************************
  * Description : (1) compares the keys of two nodes
  * 				 (2) returns a-b
@@ -105,8 +113,8 @@ Node* deleteNode (Node *p_n){
  * Note(s)     : (a) assuming 0!=p_a and 0!=p_b
  *********************************************************************************************************/
 CPU_INT08S	cmpKey		(Node* p_a, Node* p_b){
-	if(p_a->key < p_b->key) return -1;
-	if(p_a->key > p_b->key) return 1;
+	if(p_a->key->TickCtrMatch < p_b->key->TickCtrMatch) return -1;
+	if(p_a->key->TickCtrMatch > p_b->key->TickCtrMatch) return 1;
 	return 0;
 }
 
@@ -309,15 +317,6 @@ void replaceNode (Node* p_del, Node* p_new){
 			p_del->parent->right = p_new;
 		}
 	}
-}
-
-/********************************************findMin()*************************************************
- * Description : (1) finds the minimum for a given node
- * Argument(s) : p_n	node from where to start the search
- *********************************************************************************************************/
-Node* findMin (Node* p_n){
-    while(0 != p_n->left) p_n = p_n->left;
-	return p_n;
 }
 
 /********************************************helpDelete123()**********************************************
