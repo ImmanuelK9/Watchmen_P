@@ -1814,6 +1814,9 @@
                 <name>$PROJ_DIR$\..\..\..\..\..\uCOS-III\Source\os_q.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\uCOS-III\Source\os_recTaskServices.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\uCOS-III\Source\os_sem.c</name>
             </file>
             <file>

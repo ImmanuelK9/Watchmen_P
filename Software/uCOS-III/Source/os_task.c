@@ -524,7 +524,9 @@ void  OSTaskDel (OS_TCB  *p_tcb,
 #endif
     OSTaskQty--;                                            /* One less task being managed                            */
 
-    OS_TaskInitTCB(p_tcb);                                  /* Initialize the TCB to default values                   */
+    //TODO HARDCODE
+    //ExtPtr == 3 means this is a periodic task
+    if(p_tcb->ExtPtr != (void *) 3) OS_TaskInitTCB(p_tcb);                                  /* Initialize the TCB to default values                   */
     p_tcb->TaskState = (OS_STATE)OS_TASK_STATE_DEL;         /* Indicate that the task was deleted                     */
 
     OS_CRITICAL_EXIT_NO_SCHED();

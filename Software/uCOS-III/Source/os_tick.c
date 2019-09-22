@@ -31,6 +31,7 @@
 */
 
 #include <os.h>
+#include <stdio.h>
 
 #ifdef VSC_INCLUDE_SOURCE_FILE_NAMES
 const  CPU_CHAR  *os_tick__c = "$Id: $";
@@ -500,7 +501,9 @@ void  OS_TickListUpdate (void)
     }
     //TODO Where exactly should this be done? inside the critical section?
     // After the timing measurements?
-    
+    #ifdef DEBUG
+        fprintf(stdout, "%s", "In TickTask\n");
+    #endif
     // periodic task processing
     OSRecTaskListUpdate();
 
