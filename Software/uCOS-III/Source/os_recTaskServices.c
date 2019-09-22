@@ -14,7 +14,7 @@
 
 /********************************************INCLUDE FILES***********************************************/
 #include <os.h>
-#include <lib_rbTree.h>
+#include <lib_tree.h>
 #include <stdio.h>
 
 /********************************************LOCAL DEFINES***********************************************/
@@ -96,6 +96,7 @@ void OSRecTaskCreate 	(OS_TCB                *p_tcb,
 	
 	p_recListNode->info=p_recListKey;
 	p_recListNode->key = p_recListNode->info->TickCtrMatch;
+	p_recListNode->tree = RECURSIONTREE;
 
 	OSRecList = insert(OSRecList, p_recListNode);
 
