@@ -417,7 +417,11 @@ Node*	getRoot			(Node* p_n){
 }
 
 /********************************************changeNodes()**********************************************
- * Description	: changes everything of p_a and p_b except of the key
+ * Description	: equivalent to a change of keys of a and b but maintains identity
+ * 				  The following properties hold:
+ * 					(1) the keys (of a and b) change position in the tree
+ * 					(2) for each position in the tree: 
+ * 							- color, parent, left, right remain the same
  *********************************************************************************************************/
 void	changeNodes		(Node* p_a, Node* p_b){
 	//a is child of b?
