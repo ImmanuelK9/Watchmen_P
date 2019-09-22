@@ -101,6 +101,12 @@ static  void        AppTaskStart                 (void  *p_arg);
 static  void        AppTaskOne                   (void  *p_arg);
 static  void        AppTaskTwo                   (void  *p_arg);
 
+static	void		LEDBlink					(void *p_arg);
+static	void		moveForward					(void *p_arg);
+static	void		moveBackward				(void *p_arg);
+static	void		leftTurn					(void *p_arg);
+static	void		rightTurn					(void *p_arg);
+static 	void		move						(tSide dir);
 
 /*
 *********************************************************************************************************
@@ -123,9 +129,9 @@ int  main (void)
     OSInit(&err);                                               /* Init uC/OS-III.                                      */
     //fprintf(stdout, "%#10X\n", a);
     //testRBTreeScenario0(&a, &b);
-	testRBTreeScenario2(x, K);
-    //OSTaskCreate((OS_TCB     *)&AppTaskStartTCB,           /* Create the start task                                */
-      /*           (CPU_CHAR   *)"App Task Start",
+	//testRBTreeScenario2(x, K);
+    OSTaskCreate((OS_TCB     *)&AppTaskStartTCB,           /* Create the start task                                */
+                 (CPU_CHAR   *)"App Task Start",
                  (OS_TASK_PTR ) AppTaskStart,
                  (void       *) 0,
                  (OS_PRIO     ) APP_TASK_START_PRIO,
@@ -136,7 +142,7 @@ int  main (void)
                  (OS_TICK     ) 0u,
                  (void       *) (CPU_INT32U) 0, 
                  (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
-                 (OS_ERR     *)&err);*/
+                 (OS_ERR     *)&err);
 
     OSStart(&err);                                              /* Start multitasking (i.e. give control to uC/OS-III). */
 }
@@ -176,8 +182,8 @@ static  void  AppTaskStart (void  *p_arg)
     
     /* Initialise the 2 Main Tasks to  Deleted State */
 
-    OSTaskCreate((OS_TCB     *)&AppTaskOneTCB, (CPU_CHAR   *)"App Task One", (OS_TASK_PTR ) AppTaskOne, (void       *) 0, (OS_PRIO     ) APP_TASK_ONE_PRIO, (CPU_STK    *)&AppTaskOneStk[0], (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *)(CPU_INT32U) 1, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
-    OSTaskCreate((OS_TCB     *)&AppTaskTwoTCB, (CPU_CHAR   *)"App Task Two", (OS_TASK_PTR ) AppTaskTwo, (void       *) 0, (OS_PRIO     ) APP_TASK_TWO_PRIO, (CPU_STK    *)&AppTaskTwoStk[0], (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *) (CPU_INT32U) 2, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
+    OSTaskCreate((OS_TCB     *)&AppTaskOneTCB, (CPU_CHAR   *)"App Task One", (OS_TASK_PTR ) rightTurn, (void       *) 0, (OS_PRIO     ) APP_TASK_ONE_PRIO, (CPU_STK    *)&AppTaskOneStk[0], (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *)(CPU_INT32U) 1, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
+    OSTaskCreate((OS_TCB     *)&AppTaskTwoTCB, (CPU_CHAR   *)"App Task Two", (OS_TASK_PTR ) moveForward, (void       *) 0, (OS_PRIO     ) APP_TASK_TWO_PRIO, (CPU_STK    *)&AppTaskTwoStk[0], (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *) (CPU_INT32U) 2, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
 
     
     /* Delete this task */
@@ -236,6 +242,49 @@ static  void  AppTaskTwo (void  *p_arg)
     BSP_LED_Off(0u);
    OSTaskDel((OS_TCB *)0, &err);
 
+}
+
+static	void	LEDBlink	(void *p_arg){
+	OS_ERR      err;
+	CPU_INT32U i,j=0;
+
+	BSP_LED_Off(0u);	
+	BSP_LED_Toggle(0u);
+	//wait for 0,25 sec
+    for(i=0; i <ONESECONDTICK/4; i++) j = ((i * 2)+j);
+	BSP_LED_Off(0u);
+	OSTaskDel((OS_TCB *)0, &err);
+}
+
+static	void	moveForward	(void *p_arg){
+	move(FRONT);
+}
+
+static	void	moveBackward	(void *p_arg){
+	move(BACK);
+}
+
+static	void	leftTurn	(void *p_arg){
+	move(LEFT_SIDE);
+}
+
+static	void	rightTurn	(void *p_arg){
+	move(RIGHT_SIDE);
+}
+
+static 	void	move	(tSide dir){
+	OS_ERR      err;
+    CPU_INT32U  k, i, j; 
+
+    RoboTurn(dir, 7, 50);
+
+	// copied from AppTaskOne
+	// probably used as delay, so that this becomes a blocking operation
+    for(k=0; k<WORKLOAD1; k++)
+    	for(i=0; i <ONESECONDTICK/2; i++)
+        	j=2*i;
+    
+    OSTaskDel((OS_TCB *)0, &err);
 }
 
 static  void  AppRobotMotorDriveSensorEnable ()
