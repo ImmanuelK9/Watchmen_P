@@ -637,6 +637,8 @@ typedef  struct  os_tcb              OS_TCB;
 
 typedef  struct  os_rdy_list         OS_RDY_LIST;
 
+typedef  struct  os_rec_list_key	 OS_REC_LIST_KEY;
+
 typedef  struct  os_tick_spoke       OS_TICK_SPOKE;
 
 typedef  void                      (*OS_TMR_CALLBACK_PTR)(void *p_tmr, void *p_arg);
@@ -692,6 +694,32 @@ struct  os_rdy_list {
     OS_TCB              *TailPtr;                           /* Pointer to last task          at selected priority     */
     OS_OBJ_QTY           NbrEntries;                        /* Number of entries             at selected priority     */
 };
+
+
+/*
+------------------------------------------------------------------------------------------------------------------------
+*                                                 	RECURSION LIST
+------------------------------------------------------------------------------------------------------------------------
+*/
+struct os_rec_list_key {
+	CPU_INT32U			TickCtrMatch;						/* Absolute time when task is going to be ready         */
+	OS_TCB				*tcbPtr;							/* pointer to TCB assosiacted with this node			*/
+	CPU_INT32U			period;								/* period of this periodic task							*/	
+};
+
+enum color {RED, BLACK};
+//key is used to compare in the tree
+//the same info is stored somewhere in info
+//be careful when updating ; ALWAYS UPDATE BOTH
+struct node {
+    struct node *parent;
+    struct node *left;
+    struct node *right;
+    enum color  color;
+    CPU_INT32U  key;
+    OS_REC_LIST_KEY  *info;
+};
+typedef struct node Node;
 
 
 /*
@@ -1114,6 +1142,7 @@ OS_EXT            OS_OBJ_QTY             OSQQty;                      /* Number 
 
                                                                       /* READY LIST --------------------------------- */
 OS_EXT            OS_RDY_LIST            OSRdyList[OS_CFG_PRIO_MAX];  /* Table of tasks ready to run                  */
+OS_EXT			  Node					*OSRecList;
 
 
 #ifdef OS_SAFETY_CRITICAL_IEC61508
@@ -1692,6 +1721,35 @@ OS_SEM_CTR    OS_TaskSemPost            (OS_TCB                *p_tcb,
                                          OS_OPT                 opt,
                                          CPU_TS                 ts,
                                          OS_ERR                *p_err);
+
+/*$PAGE*/
+/* ================================================================================================================== */
+/*                                            RECURSIVE TASK MANAGEMENT                                                    */
+/* ================================================================================================================== */
+void          OSRecTaskCreate			(OS_TCB                *p_tcb,
+                                         CPU_CHAR              *p_name,
+                                         OS_TASK_PTR            p_task,
+                                         void                  *p_arg,
+                                         OS_PRIO                prio,
+                                         CPU_STK               *p_stk_base,
+                                         CPU_STK_SIZE           stk_limit,
+                                         CPU_STK_SIZE           stk_size,
+                                         OS_MSG_QTY             q_size,
+                                         OS_TICK                time_quanta,
+                                         void                  *p_ext,
+                                         OS_OPT                 opt,
+                                         OS_ERR                *p_err,
+										 //additional data for recursion
+										 Node				   *p_recListNode,
+                                         OS_REC_LIST_KEY	   *p_recListKey,
+                                         CPU_INT32U				period	
+										 );
+
+void          OSRecTaskFinish           (OS_TCB                *p_tcb,
+                                         OS_ERR                *p_err);
+
+/* ------------------------------------------------ INTERNAL FUNCTIONS ---------------------------------------------- */
+void		OSRecTaskListUpdate			(void);
 
 /*$PAGE*/
 /* ================================================================================================================== */
