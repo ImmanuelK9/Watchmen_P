@@ -31,9 +31,11 @@ void    testRBTreeScenario0(Node* a, Node* b){
     a->color = BLACK;
     a->key=15;
     a->key=12;
+    a->tree = RBTREE;
 
     //Node* b = (Node*)  malloc(sizeof(Node));
     b->key=5;
+    b->tree = RBTREE;
     insert(a, b);
     testRBTree(a);
     //free(a);
@@ -44,8 +46,10 @@ Node*   testRBTreeScenario1(Node* x, CPU_INT32U k){
     Node* currentRoot = x;
     x->color = BLACK;
     x->key=15;
+    x->tree = RBTREE;
     for(int i=0; i<k; ++i){
         x[i+1].key=keys[i];
+        x[i+1].tree = RBTREE;
         currentRoot = insert(currentRoot, x+i+1);
     }
     testRBTree(currentRoot);

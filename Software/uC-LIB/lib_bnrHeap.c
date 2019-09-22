@@ -2,9 +2,9 @@
 *                                                uC/LIB
 *                                        CUSTOM LIBRARY MODULES
 *
-*                                            BINARY HEAP
+*                                            BINARY MIN HEAP
 *
-* Filename		: bnrHeap.c
+* Filename		: lib_bnrHeap.c
 * Version		: ?
 * Programmer(s)	: Watchmen_T
 *
@@ -13,6 +13,8 @@
 
 
 /********************************************INCLUDE FILES***********************************************/
+#include "lib_bnrHeap.h"
+#include "lib_tree.h"
 
 /********************************************LOCAL DEFINES***********************************************/
 
@@ -28,12 +30,36 @@
 
 /*************************************LOCAL CONFIGURATION ERRORS*****************************************/
 
-/********************************************<function_name>**********************************************
- * Description	: 
- * Argument(s)	: 
- * Return(s)	: 
+/******************************************bhIinsert()*****************************************************
+ * Description : (1) insert a node into the tree
+ * Argument(s) : p_root  pointer to root of the tree
+ *               p_n     pointer to node that should be inserted
+ * Return(s)   : A pointer to the (new) root of the tree
+ *********************************************************************************************************/
+Node* bhInsert    (Node *p_root, Node *p_n){
+    //TODO
+    return 0;
+}
+
+/***************************************bhDeleteNode()******************************************************
+ * Description	: delete a node from the tree
+ * Argument(s)	: p_n	pointer to node that should be deleted
+ * Return(s)    : A pointer to the (new) root of the tree
  * Note(s)		:
  *********************************************************************************************************/
+Node* bhDeleteNode (Node *p_n){
+    //TODO
+	return 0;
+}
+
+/******************************************bhFindMin()*************************************************
+ * Description : (1) finds the minimum
+ * Argument(s) : p_n	node from where to start the search (should be the root)
+ *********************************************************************************************************/
+Node* bhFindMin (Node* p_n){
+    //TODO
+    return p_n;
+}
 
 
 /*********************************************LOCAL FUNCTIONS********************************************/

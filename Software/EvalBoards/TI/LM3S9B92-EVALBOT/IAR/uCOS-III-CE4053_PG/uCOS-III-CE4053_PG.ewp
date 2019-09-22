@@ -1724,6 +1724,9 @@
                 <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_ascii.h</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_bnrHeap.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_def.h</name>
             </file>
             <file>
@@ -1738,11 +1741,17 @@
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_str.h</name>
             </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_tree.h</name>
+            </file>
         </group>
         <group>
             <name>Source</name>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_ascii.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_bnrHeap.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_math.c</name>
@@ -1755,6 +1764,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_str.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_tree.c</name>
             </file>
         </group>
     </group>

@@ -698,7 +698,7 @@ struct  os_rdy_list {
 
 /*
 ------------------------------------------------------------------------------------------------------------------------
-*                                                 	RECURSION LIST
+*                                           RECURSION / EDF LIST
 ------------------------------------------------------------------------------------------------------------------------
 */
 struct os_rec_list_key {
@@ -708,6 +708,9 @@ struct os_rec_list_key {
 };
 
 enum color {RED, BLACK};
+enum tree {RBTREE, BNRHEAP};
+#define     RECURSIONTREE       RBTREE
+#define     EDFTREE             RBTREE
 //key is used to compare in the tree
 //the same info is stored somewhere in info
 //be careful when updating ; ALWAYS UPDATE BOTH
@@ -716,6 +719,7 @@ struct node {
     struct node *left;
     struct node *right;
     enum color  color;
+    enum tree   tree;
     CPU_INT32U  key;
     OS_REC_LIST_KEY  *info;
 };

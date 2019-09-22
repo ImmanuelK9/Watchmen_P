@@ -37,10 +37,9 @@ typedef struct node Node;*/
 /***********************************************MACRO'S**************************************************/
 
 /******************************************FUNCTION PROTOTYPES*******************************************/
-Node*       insert              (Node *p_root, Node *p_n);
-Node*       deleteNode          (Node *p_n);
-Node*	    findMin			    (Node* p_n);
-CPU_INT08S	cmpKey		        (Node* p_a, Node* p_b);
+Node*       rbInsert              (Node *p_root, Node *p_n);
+Node*       rbDeleteNode          (Node *p_n);
+Node*	    rbFindMin			    (Node* p_n);
 
 /***********************************************MODULE END***********************************************/
 #endif

@@ -2,17 +2,17 @@
 *                                                uC/LIB
 *                                        CUSTOM LIBRARY MODULES
 *
-*                                            BINARY MIN HEAP
+*                                            TREE INTERFACE
 *
-* Filename		: lib_bnrHeap.h
+* Filename		: lib_tree.h
 * Version		: ?
 * Programmer(s)	: Watchmen_T
 *
 * Note(s) : 
 *********************************************************************************************************/
 
-#ifndef BNRHEAP_MODULE_PRESENT
-#define BNRHEAP_MODULE_PRESENT
+#ifndef TREE_MODULE_PRESENT
+#define TREE_MODULE_PRESENT
 
 /********************************************INCLUDE FILES***********************************************/
 #include <cpu.h>
@@ -29,9 +29,10 @@
 /***********************************************MACRO'S**************************************************/
 
 /******************************************FUNCTION PROTOTYPES*******************************************/
-Node*       bhInsert                (Node *p_root, Node *p_n);
-Node*       bhDeleteNode            (Node *p_n);
-Node*	    bhFindMin			    (Node* p_n);
+Node*       insert              (Node *p_root, Node *p_n);
+Node*       deleteNode          (Node *p_n);
+Node*	    findMin			    (Node* p_n);
+CPU_INT08S	cmpKey		        (Node* p_a, Node* p_b);
 
 /******************************************CONFIGURATION ERRORS******************************************/
 
