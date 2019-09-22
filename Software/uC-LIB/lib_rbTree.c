@@ -60,6 +60,7 @@ Node* insert    (Node *p_root, Node *p_n){
 /*****************************************deleteNode()******************************************************
  * Description	: delete a node from the tree
  * Argument(s)	: p_n	pointer to node that should be deleted
+ * Return(s)   : A pointer to the (new) root of the tree
  * Note(s)		: (a) ---
  * 				  (b) there are different cases that can occur
  * 					(b1) n has two children -> replace key with successor's key, delete successor
@@ -102,7 +103,7 @@ Node* deleteNode (Node *p_n){
  * Argument(s) : p_n	node from where to start the search
  *********************************************************************************************************/
 Node* findMin (Node* p_n){
-    while(0 != p_n->left) p_n = p_n->left;
+    while(p_n!=0 && 0 != p_n->left) p_n = p_n->left;
 	return p_n;
 }
 
@@ -113,8 +114,8 @@ Node* findMin (Node* p_n){
  * Note(s)     : (a) assuming 0!=p_a and 0!=p_b
  *********************************************************************************************************/
 CPU_INT08S	cmpKey		(Node* p_a, Node* p_b){
-	if(p_a->key->TickCtrMatch < p_b->key->TickCtrMatch) return -1;
-	if(p_a->key->TickCtrMatch > p_b->key->TickCtrMatch) return 1;
+	if(p_a->key < p_b->key) return -1;
+	if(p_a->key > p_b->key) return 1;
 	return 0;
 }
 

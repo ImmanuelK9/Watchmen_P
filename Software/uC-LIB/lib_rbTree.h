@@ -19,17 +19,18 @@
 #include <os.h>        // for specific key
 
 /***********************************************DEFINES*************************************************/
-enum color {RED, BLACK};
+//outsourced to os.h
+//enum color {RED, BLACK};
 
 /*********************************************DATA TYPES************************************************/
-struct node {
+/*struct node {
     struct node *parent;
     struct node *left;
     struct node *right;
     enum color  color;
     OS_REC_LIST_KEY  *key;
 };
-typedef struct node Node;
+typedef struct node Node;*/
 
 /******************************************GLOBAL VARIABLES**********************************************/
 

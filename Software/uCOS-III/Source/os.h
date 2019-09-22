@@ -62,7 +62,6 @@ extern "C" {
 #include <lib_def.h>
 #include <os_type.h>
 #include <os_cpu.h>
-#include <lib_rbTree.h>
 
 
 /*
@@ -707,6 +706,20 @@ struct os_rec_list_key {
 	OS_TCB				*tcbPtr;							/* pointer to TCB assosiacted with this node			*/
 	CPU_INT32U			period;								/* period of this periodic task							*/	
 };
+
+enum color {RED, BLACK};
+//key is used to compare in the tree
+//the same info is stored somewhere in info
+//be careful when updating ; ALWAYS UPDATE BOTH
+struct node {
+    struct node *parent;
+    struct node *left;
+    struct node *right;
+    enum color  color;
+    CPU_INT32U  key;
+    OS_REC_LIST_KEY  *info;
+};
+typedef struct node Node;
 
 
 /*
@@ -1727,7 +1740,9 @@ void          OSRecTaskCreate			(OS_TCB                *p_tcb,
                                          OS_OPT                 opt,
                                          OS_ERR                *p_err,
 										 //additional data for recursion
-										 CPU_INT32U				period	
+										 Node				   *p_recListNode,
+                                         OS_REC_LIST_KEY	   *p_recListKey,
+                                         CPU_INT32U				period	
 										 );
 
 void          OSRecTaskFinish           (OS_TCB                *p_tcb,
