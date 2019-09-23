@@ -29,14 +29,14 @@
 /***************************************LOCAL GLOBAL VARIABLES*******************************************/
 
 /**************************************LOCAL FUNCTION PROTOTYPES*****************************************/
-CPU_STK      *OSRecTaskStkInit          (OS_TASK_PTR            p_task,
+CPU_STK		*OSRecTaskStkInit			(OS_TASK_PTR            p_task,
                                          void                  *p_arg,
                                          CPU_STK               *p_stk_base,
                                          CPU_STK               *p_stk_limit,
                                          CPU_STK_SIZE           stk_size,
                                          OS_OPT                 opt);
 
-void          OSTaskCreateMod           (OS_TCB                *p_tcb,
+void		OSTaskCreateMod				(OS_TCB                *p_tcb,
                                          CPU_CHAR              *p_name,
                                          OS_TASK_PTR            p_task,
                                          void                  *p_arg,
@@ -60,7 +60,9 @@ void		OSRecTaskFinishHelp(void);
  *
  * Description	: Similar to OSTaskCreate, but sets the extension pointer to point to the period
  *
- * Arguments	: 	...            	see OSTaskCreate
+ * Arguments	: 	...            		see OSTaskCreate
+ * 					prio				this is ignored because always prio = OSCfg_EdfSchedPrio
+ * 					...					see OSTaskCreate
  *                	//additional data for recursion
  * 					p_recListNode		pointer to Node that is used for the RecList
  * 				  	p_recListKey		pointer to key datastructure that is used as an info in the node
@@ -70,7 +72,7 @@ void		OSRecTaskFinishHelp(void);
  *
  *
  * Returns		: A pointer to the TCB of the task created.  This pointer must be used as an ID (i.e handle) to the task.
- * Notes		: TODO add functionality to schedule together
+ * Notes		:	(1) TODO add functionality to schedule together
 ***********************************************************************************************************/
 void OSRecTaskCreate 	(OS_TCB                *p_tcb,
                          CPU_CHAR              *p_name,
@@ -92,7 +94,6 @@ void OSRecTaskCreate 	(OS_TCB                *p_tcb,
 						 OS_NODE_INFO		   *p_edfRdyListKey,
 						 CPU_INT32U				period	 			 
 						 ){
-	//TODO
 	//create task similar to OSTaskCreate?
 	p_recListKey->period=period;
 	p_recListKey->tcbPtr=p_tcb;
@@ -128,7 +129,7 @@ void OSRecTaskCreate 	(OS_TCB                *p_tcb,
                     p_err);
 }
 
-/*******************************************OSRecTaskFinish()*********************************************
+/********************************DEPRECATED**OSRecTaskFinish()*********************************************									
  * Description 	:	A recursive task should call this function when it finishes (at least indirectly)
  * Argument(s)	: 	p_tcb      is the TCB of the tack to delete
  *					p_err      is a pointer to an error code returned by this function:
@@ -136,58 +137,7 @@ void OSRecTaskCreate 	(OS_TCB                *p_tcb,
  * Note(s)		:	NOT IN USE
  *********************************************************************************************************/
 void OSRecTaskFinish (OS_TCB *p_tcb1, OS_ERR *p_err){
-	//reset stack: reset StkPtr, clear stack
-	//copied from OSTaskCreate
-	CPU_SR_ALLOC();
-	OS_TCB *p_tcb = p_tcb1;
-	if (p_tcb == (OS_TCB *)0) {                             /* Finish 'Self'?                                         */
-        CPU_CRITICAL_ENTER();
-        p_tcb  = OSTCBCurPtr;                               /* Yes.                                                   */
-        CPU_CRITICAL_EXIT();
-    }
-	OS_CRITICAL_ENTER();
-	OS_OPT 		opt = p_tcb->Opt;
-	CPU_STK 	*p_sp = p_tcb->StkPtr;
-	CPU_STK 	*p_stk_base = p_tcb->StkBasePtr;
-	CPU_STK_SIZE	stk_size = p_tcb->StkSize;
-	CPU_STK_SIZE	i;
-
-	OS_RdyListRemove(p_tcb);
-															/* --------------- CLEAR THE TASK'S STACK --------------- */
-	if ((opt & OS_OPT_TASK_STK_CHK) != (OS_OPT)0) {         /* See if stack checking has been enabled                 */
-		if ((opt & OS_OPT_TASK_STK_CLR) != (OS_OPT)0) {     /* See if stack needs to be cleared                       */
-			p_sp = p_stk_base;
-			for (i = 0u; i < stk_size; i++) {               /* Stack grows from HIGH to LOW memory                    */
-				*p_sp = (CPU_STK)0;                         /* Clear from bottom of stack and up!                     */
-				p_sp++;
-			}
-		}
-	}
 	
-	p_sp = OSRecTaskStkInit(	p_tcb->TaskEntryAddr,     /* Initialize the stack, i.e. init the CPU regs */
-								p_tcb->TaskEntryArg,         
-								p_tcb->StkBasePtr,
-								p_tcb->StkLimitPtr,
-								p_tcb->StkSize,
-								p_tcb->Opt);
-	
-	//CPU_CRITICAL_ENTER();
-	p_tcb  = OSTCBCurPtr;	
-	//CPU_CRITICAL_EXIT();
-
-	p_tcb->StkPtr        = p_sp;                            /* set the new sp */
-
-	//stack should be successfully reset now
-	//TODO
-	//what to do from here?? ----------------------------
-	p_tcb->TaskState = (OS_STATE)OS_TASK_STATE_DEL;
-	#if APP_DEBUG
-		fprintf(stdout, "%s", "In OSTaskRecFinish\n");
-	#endif
-	OS_CRITICAL_EXIT_NO_SCHED();
-	OSSched();
-
-	*p_err = OS_ERR_NONE;
 }
 
 
@@ -207,6 +157,7 @@ void OSRecTaskListUpdate (void){
 		p_min->info->tcbPtr->TaskState = OS_TASK_STATE_RDY;
 		
 		//orientate at OSTaskCreate, many (unused) parts got left out for better overview
+		//this should be optimized later
 		//=====================
 			CPU_STK_SIZE   i;
 			CPU_STK       *p_sp;
@@ -313,7 +264,7 @@ void OSRecTaskListUpdate (void){
 
 /*********************************************LOCAL FUNCTIONS********************************************/
 
-/********************************************************************************************************
+/*********************************************OSRecTaskStkInit()*****************************************
  *                               INITIALIZE A PERIODIC TASK'S STACK
  *
  * Description: This function is called by ... to initialize the stack
@@ -358,12 +309,12 @@ CPU_STK  *OSRecTaskStkInit (OS_TASK_PTR    p_task,
     return (p_stk);
 }
 
-/**********************************************************************************************************
+/**********************************************OSTaskCreateMod()*******************************************
  * Description 	:	Creates a periodic task
  * Note(s)		:	largely copied from OSTaskCreate but this
  * 						(1) does not put the task into ready Q -> does not get scheduled directly
  * 						(2) uses another TaskStkInit function / this may be omitted
- * 						(3) ALWAYS uses OSCfg_EdfSchedPrio as prio !! TODO
+ * 						(3) ALWAYS uses OSCfg_EdfSchedPrio as prio
  *********************************************************************************************************/
 void  OSTaskCreateMod (OS_TCB        *p_tcb,
                     CPU_CHAR      *p_name,
@@ -485,7 +436,7 @@ void  OSTaskCreateMod (OS_TCB        *p_tcb,
 
 		p_tcb->NamePtr       = p_name;                          /* Save task name                                         */
 
-		p_tcb->Prio          = OSCfg_EdfSchedPrio;              /* Save the task's priority  -------- different           */
+		p_tcb->Prio          = OSCfg_EdfSchedPrio;              /* Save the task's priority  -------- different -----     */
 
 		p_tcb->StkPtr        = p_sp;                            /* Save the new top-of-stack pointer                      */
 		p_tcb->StkLimitPtr   = p_stk_limit;                     /* Save the stack limit pointer                           */
@@ -515,6 +466,7 @@ void  OSTaskCreateMod (OS_TCB        *p_tcb,
 	#endif
 
 		OSTaskCreateHook(p_tcb);                                /* Call user defined hook                                 */
+	//do not ask task to ready Q for now
 	#if 0
 																/* --------------- ADD TASK TO READY LIST --------------- */
 		OS_CRITICAL_ENTER();
@@ -537,24 +489,11 @@ void  OSTaskCreateMod (OS_TCB        *p_tcb,
 		OSSched();
 }
 
-/**********************************************************************************************************
+/***************************************************DEPRECATED*********************************************
  * Description 	:	This function was used as a substitute for OS_TaskReturn, this needs to be specified
  * 					during task stack init
  * Note(s)		:	NOT IN USE
  *********************************************************************************************************/
 void OSRecTaskFinishHelp(void){
-	OS_ERR err;
-
-	CPU_SR_ALLOC();
-	OS_CRITICAL_ENTER();
-	OS_TCB *p_tcb;                                     
-	CPU_CRITICAL_ENTER();
-	p_tcb  = OSTCBCurPtr;                             
-	CPU_CRITICAL_EXIT();
-	p_tcb->TaskState = (OS_STATE)OS_TASK_STATE_DEL;
-	OS_RdyListRemove(p_tcb);
-	OS_CRITICAL_EXIT_NO_SCHED();
-    OSSched();
-
 	//OSRecTaskFinish ((OS_TCB *)0 , (OS_ERR *)&err);
 }
