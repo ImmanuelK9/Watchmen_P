@@ -307,6 +307,11 @@ void  OSTaskCreate (OS_TCB        *p_tcb,
     }
 #endif
 
+    if(OSCfg_EdfSchedPrio == prio){                         /* This priority is reserved for tasks with deadlines     */
+        *p_err = OS_ERR_PRIO_INVALID;                       /* They use a different task creation routine             */
+        return;
+    }
+
 #if OS_CFG_ISR_POST_DEFERRED_EN > 0u
     if (prio == (OS_PRIO)0) {
         if (p_tcb != &OSIntQTaskTCB) {

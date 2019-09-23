@@ -3,6 +3,7 @@
         "includes.h": "c",
         "lib_rbtree.h": "c",
         "cpu.h": "c",
-        "test_rbtree.h": "c"
+        "test_rbtree.h": "c",
+        "typeinfo": "c"
     }
 }
