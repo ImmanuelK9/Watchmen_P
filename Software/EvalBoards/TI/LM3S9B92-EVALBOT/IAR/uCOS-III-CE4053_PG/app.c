@@ -308,6 +308,49 @@ static  void  AppTaskThree (void  *p_arg)
     //OS tried to delete because there is an "accidental return"
 }
 
+static	void	LEDBlink	(void *p_arg){
+	OS_ERR      err;
+	CPU_INT32U i,j=0;
+
+	BSP_LED_Off(0u);	
+	BSP_LED_Toggle(0u);
+	//wait for 0,25 sec
+    for(i=0; i <ONESECONDTICK/4; i++) j = ((i * 2)+j);
+	BSP_LED_Off(0u);
+	OSTaskDel((OS_TCB *)0, &err);
+}
+
+static	void	moveForward	(void *p_arg){
+	move(FRONT);
+}
+
+static	void	moveBackward	(void *p_arg){
+	move(BACK);
+}
+
+static	void	leftTurn	(void *p_arg){
+	move(LEFT_SIDE);
+}
+
+static	void	rightTurn	(void *p_arg){
+	move(RIGHT_SIDE);
+}
+
+static 	void	move	(tSide dir){
+	OS_ERR      err;
+    CPU_INT32U  k, i, j; 
+
+    RoboTurn(dir, 7, 50);
+
+	// copied from AppTaskOne
+	// probably used as delay, so that this becomes a blocking operation
+    for(k=0; k<WORKLOAD1; k++)
+    	for(i=0; i <ONESECONDTICK/2; i++)
+        	j=2*i;
+    
+    OSTaskDel((OS_TCB *)0, &err);
+}
+
 static  void  AppRobotMotorDriveSensorEnable ()
 {
     BSP_WheelSensorEnable();
