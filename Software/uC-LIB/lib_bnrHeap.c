@@ -8,7 +8,7 @@
 * Version		: ?
 * Programmer(s)	: Watchmen_T
 *
-* Note(s) : 
+* Note(s) : (1) Maybe use CPU_DATA    CPU_CntLeadZeros (CPU_DATA    val); ?
 *********************************************************************************************************/
 
 
