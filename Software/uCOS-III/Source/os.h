@@ -637,6 +637,8 @@ typedef  struct  os_tcb              OS_TCB;
 
 typedef  struct  os_rdy_list         OS_RDY_LIST;
 
+typedef  struct  os_tcb_to_node		 OS_TCB_TO_NODE;
+
 typedef  struct  os_node_info		 OS_NODE_INFO;
 
 typedef	 struct	 node				 Node;
@@ -704,12 +706,15 @@ struct  os_rdy_list {
 ------------------------------------------------------------------------------------------------------------------------
 */
 
+struct os_tcb_to_node {
+	Node	*recNode;										/* pointer to the Node used in OSRecList					*/
+	Node	*edfNode;										/* pointer to the Node used in OSEdfRdyList					*/
+};
+
 struct os_node_info {
 	CPU_INT32U			TickCtrMatch;						/* Absolute time when task is going to be ready         */
 	OS_TCB				*tcbPtr;							/* pointer to TCB assosiacted with this node			*/
 	CPU_INT32U			period;								/* period of this periodic task							*/
-	Node				*recNode;							/* pointer to the Node used in OSRecList					*/
-	Node				*edfNode;							/* pointer to the Node used in OSEdfRdyList					*/
 };
 
 enum color {RED, BLACK};

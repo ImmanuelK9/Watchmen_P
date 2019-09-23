@@ -70,7 +70,8 @@
 			static Node				varName##RecNode;		\
 			static OS_NODE_INFO		varName##RecListKey;	\
 			static Node				varName##EdfNode;		\
-			static OS_NODE_INFO		varName##EdfListKey;
+			static OS_NODE_INFO		varName##EdfListKey;	\
+			static OS_TCB_TO_NODE	varName##TcbToNode;
 
 /************************************macroOSRecTaskCreate()*********************************************
  * Description 	:	Use this macro to create a periodic task
@@ -84,14 +85,14 @@
  *					period
  * Note(s)		:	Example usage: allocStaticMemWDeadline(exampleTask, 256);
  *********************************************************************************************************/
-#define macroOSRecTaskCreate(varName, name, arg, prio, stkSize, stkLimitDivider, extPtr, period)	\
+#define macroOSRecTaskCreate(varName, name, arg, prio, stkSize, stkLimitDivider, period)	\
 			OSRecTaskCreate((OS_TCB *) &##varName##TCB, (CPU_CHAR *) #varName,						\
 				(OS_TASK_PTR) name, (void *) arg, (OS_PRIO) prio, (CPU_STK *) &##varName##Stk[0],	\
 				(CPU_STK_SIZE) stkSize / stkLimitDivider, (CPU_STK_SIZE) stkSize,					\
-				(OS_MSG_QTY) 0u, (OS_TICK) 0u, (void *) extPtr,										\
+				(OS_MSG_QTY) 0u, (OS_TICK) 0u, (void *) &##varName##TcbToNode,									\
 				(OS_OPT)(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),								\
 				(OS_ERR *) &err, &##varName##RecNode, &##varName##RecListKey,							\
-				&##varName##EdfNode, &##varName##EdfListKey,period)
+				&##varName##EdfNode, &##varName##EdfListKey, period)
 
 /*
 *********************************************************************************************************
@@ -238,13 +239,14 @@ static  void  AppTaskStart (void  *p_arg)
 
     //OSTaskCreate((OS_TCB     *)&AppTaskOneTCB, (CPU_CHAR   *)"App Task One", (OS_TASK_PTR ) AppTaskOne, (void       *) 0, (OS_PRIO     ) APP_TASK_ONE_PRIO, (CPU_STK    *)&AppTaskOneStk[0], (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *)(CPU_INT32U) 1, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
     //OSTaskCreate((OS_TCB     *)&AppTaskTwoTCB, (CPU_CHAR   *)"App Task Two", (OS_TASK_PTR ) AppTaskTwo, (void       *) 0, (OS_PRIO     ) APP_TASK_TWO_PRIO, (CPU_STK    *)&AppTaskTwoStk[0], (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *) (CPU_INT32U) 2, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
-    //OSRecTaskCreate((OS_TCB     *)&AppTaskThreeTCB, (CPU_CHAR   *)"App Task Three", (OS_TASK_PTR ) AppTaskThree, (void       *) 0, 4, (CPU_STK    *)&AppTaskThreeStk[0], (CPU_STK_SIZE) APP_TASK_THREE_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_THREE_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *) (CPU_INT32U) 3, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err, &AppTaskThreeNode, &AppTaskThreeRecListKey, 5000);
-	macroOSRecTaskCreate(AppTaskThree, AppTaskThree, 0, 4, APP_TASK_THREE_STK_SIZE, 10u, 3, 5000);
-	//macroOSRecTaskCreate(APPLED, LEDBlink, 0, 4, APP_LED_BLINK_STK_SIZE, 10u, 3, 5000);
-	//macroOSRecTaskCreate(APPMoveF, moveForward, 0, 4, APP_MOVE_F_STK_SIZE, 10u, 3, 10000);
-	//macroOSRecTaskCreate(APPMoveB, moveBackward, 0, 4, APP_MOVE_B_STK_SIZE, 10u, 3, 17000);
-	//macroOSRecTaskCreate(APPMoveL, leftTurn, 0, 4, APP_MOVE_L_STK_SIZE, 10u, 3, 25000);
-	//macroOSRecTaskCreate(APPMoveR, rightTurn, 0, 4, APP_MOVE_R_STK_SIZE, 10u, 3, 47000);
+	
+	//prio is (should be) ignored by the OS from now on, because periodic => OSCfg_EdfSchedPrio
+	//macroOSRecTaskCreate(AppTaskThree, AppTaskThree, 0, 4, APP_TASK_THREE_STK_SIZE, 10u, 5000);
+	macroOSRecTaskCreate(APPLED, LEDBlink, 0, 4, APP_LED_BLINK_STK_SIZE, 10u, 5000);
+	//macroOSRecTaskCreate(APPMoveF, moveForward, 0, 4, APP_MOVE_F_STK_SIZE, 10u, 10000);
+	//macroOSRecTaskCreate(APPMoveB, moveBackward, 0, 4, APP_MOVE_B_STK_SIZE, 10u, 17000);
+	//macroOSRecTaskCreate(APPMoveL, leftTurn, 0, 4, APP_MOVE_L_STK_SIZE, 10u, 25000);
+	//macroOSRecTaskCreate(APPMoveR, rightTurn, 0, 4, APP_MOVE_R_STK_SIZE, 10u, 47000);
     
     /* Delete this task */
     OSTaskDel((OS_TCB *)0, &err);

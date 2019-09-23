@@ -98,16 +98,18 @@ void OSRecTaskCreate 	(OS_TCB                *p_tcb,
 	p_recListKey->tcbPtr=p_tcb;
 	//should be changed later when schedule together functionality is implemented
 	p_recListKey->TickCtrMatch = OSTickCtr + period;
-	p_recListKey->recNode = p_recListNode;
-	p_recListKey->edfNode = p_edfRdyListNode;
 
 	p_edfRdyListKey->tcbPtr=p_tcb;
-	p_edfRdyListKey->recNode = p_recListNode;
-	p_edfRdyListKey->edfNode = p_edfRdyListNode;
 
 	p_recListNode->info=p_recListKey;
 	p_recListNode->key = p_recListNode->info->TickCtrMatch;
 	p_recListNode->tree = RECURSIONTREE;
+
+	OS_TCB_TO_NODE *p_tcbToNode = (OS_TCB_TO_NODE *) p_ext;
+	p_tcbToNode->recNode = p_recListNode;
+	p_tcbToNode->edfNode = p_edfRdyListNode;
+
+	p_edfRdyListNode->info = p_recListKey;
 
 	OSRecList = insert(OSRecList, p_recListNode);
 
@@ -254,7 +256,7 @@ void OSRecTaskListUpdate (void){
 
 			p_tcb->NamePtr       = p_name;                          /* Save task name                                         */
 
-			p_tcb->Prio          = prio;                            /* Save the task's priority                               */
+			p_tcb->Prio          = OSCfg_EdfSchedPrio;              /* Save the task's priority  ----!!!different                      */
 
 			p_tcb->StkPtr        = p_sp;                            /* Save the new top-of-stack pointer                      */
 			p_tcb->StkLimitPtr   = p_stk_limit;                     /* Save the stack limit pointer                           */
@@ -275,11 +277,14 @@ void OSRecTaskListUpdate (void){
 				OSTaskCreateHook(p_tcb);                                /* Call user defined hook                                 */
 																		/* --------------- ADD TASK TO READY LIST --------------- */
 				OS_CRITICAL_ENTER();
-				OS_PrioInsert(p_tcb->Prio);
-				OS_RdyListInsertTail(p_tcb);
+				//OS_PrioInsert(p_tcb->Prio);
+				//OS_RdyListInsertTail(p_tcb);
 				
-				//substitute in order to use edf scheduler
-				//OS_EdfRdyListInsert(p_min);
+				//substitute above to below in order to use edf scheduler
+				OS_TCB_TO_NODE *tcbToNode =  (OS_TCB_TO_NODE *) (p_min->info->tcbPtr->ExtPtr);
+				tcbToNode->edfNode->key = OSTickCtr + p_min->info->period;	/* set Deadline */
+				tcbToNode->edfNode->info->TickCtrMatch = OSTickCtr + p_min->info->period;
+				OS_EdfRdyListInsert(tcbToNode->edfNode);
 
 			#if OS_CFG_DBG_EN > 0u
 				OS_TaskDbgListAdd(p_tcb);
@@ -480,7 +485,7 @@ void  OSTaskCreateMod (OS_TCB        *p_tcb,
 
 		p_tcb->NamePtr       = p_name;                          /* Save task name                                         */
 
-		p_tcb->Prio          = prio;              /* Save the task's priority  -------- different           */
+		p_tcb->Prio          = OSCfg_EdfSchedPrio;              /* Save the task's priority  -------- different           */
 
 		p_tcb->StkPtr        = p_sp;                            /* Save the new top-of-stack pointer                      */
 		p_tcb->StkLimitPtr   = p_stk_limit;                     /* Save the stack limit pointer                           */
