@@ -64,6 +64,8 @@ void		OSRecTaskFinishHelp(void);
  *                	//additional data for recursion
  * 					p_recListNode		pointer to Node that is used for the RecList
  * 				  	p_recListKey		pointer to key datastructure that is used as an info in the node
+ * 					p_edfRdyListNode	pointer to Node that is used for the EdfRdyList
+ * 					p_edfRdyListKey		pointer to key datastructure that is used as an info in the node
  * 				  	period				periodicity of this task
  *
  *
@@ -85,8 +87,10 @@ void OSRecTaskCreate 	(OS_TCB                *p_tcb,
                          OS_ERR                *p_err,
 						 //additional data for recursion
 						 Node				   *p_recListNode,
-						 OS_REC_LIST_KEY	   *p_recListKey,
-						 CPU_INT32U				period			 
+						 OS_NODE_INFO		   *p_recListKey,
+						 Node				   *p_edfRdyListNode,
+						 OS_NODE_INFO		   *p_edfRdyListKey,
+						 CPU_INT32U				period	 			 
 						 ){
 	//TODO
 	//create task similar to OSTaskCreate?
@@ -94,7 +98,13 @@ void OSRecTaskCreate 	(OS_TCB                *p_tcb,
 	p_recListKey->tcbPtr=p_tcb;
 	//should be changed later when schedule together functionality is implemented
 	p_recListKey->TickCtrMatch = OSTickCtr + period;
-	
+	p_recListKey->recNode = p_recListNode;
+	p_recListKey->edfNode = p_edfRdyListNode;
+
+	p_edfRdyListKey->tcbPtr=p_tcb;
+	p_edfRdyListKey->recNode = p_recListNode;
+	p_edfRdyListKey->edfNode = p_edfRdyListNode;
+
 	p_recListNode->info=p_recListKey;
 	p_recListNode->key = p_recListNode->info->TickCtrMatch;
 	p_recListNode->tree = RECURSIONTREE;

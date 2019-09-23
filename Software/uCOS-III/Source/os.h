@@ -637,7 +637,9 @@ typedef  struct  os_tcb              OS_TCB;
 
 typedef  struct  os_rdy_list         OS_RDY_LIST;
 
-typedef  struct  os_rec_list_key	 OS_REC_LIST_KEY;
+typedef  struct  os_node_info		 OS_NODE_INFO;
+
+typedef	 struct	 node				 Node;
 
 typedef  struct  os_tick_spoke       OS_TICK_SPOKE;
 
@@ -701,10 +703,13 @@ struct  os_rdy_list {
 *                                           RECURSION / EDF LIST
 ------------------------------------------------------------------------------------------------------------------------
 */
-struct os_rec_list_key {
+
+struct os_node_info {
 	CPU_INT32U			TickCtrMatch;						/* Absolute time when task is going to be ready         */
 	OS_TCB				*tcbPtr;							/* pointer to TCB assosiacted with this node			*/
-	CPU_INT32U			period;								/* period of this periodic task							*/	
+	CPU_INT32U			period;								/* period of this periodic task							*/
+	Node				*recNode;							/* pointer to the Node used in OSRecList					*/
+	Node				*edfNode;							/* pointer to the Node used in OSEdfRdyList					*/
 };
 
 enum color {RED, BLACK};
@@ -715,15 +720,15 @@ enum tree {RBTREE, BNRHEAP};
 //the same info is stored somewhere in info
 //be careful when updating ; ALWAYS UPDATE BOTH
 struct node {
-    struct node *parent;
-    struct node *left;
-    struct node *right;
-    enum color  color;
-    enum tree   tree;
-    CPU_INT32U  key;
-    OS_REC_LIST_KEY  *info;
+    struct	node	*parent;
+    struct	node	*left;
+    struct	node	*right;
+    enum	color	color;
+    enum	tree	tree;
+CPU_INT32U			key;
+    OS_NODE_INFO 	*info;
 };
-typedef struct node Node;
+
 
 
 /*
@@ -1748,8 +1753,10 @@ void          OSRecTaskCreate			(OS_TCB                *p_tcb,
                                          OS_ERR                *p_err,
 										 //additional data for recursion
 										 Node				   *p_recListNode,
-                                         OS_REC_LIST_KEY	   *p_recListKey,
-                                         CPU_INT32U				period	
+										 OS_NODE_INFO		   *p_recListKey,
+										 Node				   *p_edfRdyListNode,
+										 OS_NODE_INFO		   *p_edfRdyListKey,
+										 CPU_INT32U				period	 
 										 );
 
 void          OSRecTaskFinish           (OS_TCB                *p_tcb,
