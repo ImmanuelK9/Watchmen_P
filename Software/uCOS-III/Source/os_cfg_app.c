@@ -161,6 +161,7 @@ CPU_INT32U     const  OSCfg_TickTaskStkSizeRAM   = (CPU_INT32U  )sizeof(OSCfg_Ti
 OS_OBJ_QTY     const  OSCfg_TickWheelSize        = (OS_OBJ_QTY  )OS_CFG_TICK_WHEEL_SIZE;
 CPU_INT32U     const  OSCfg_TickWheelSizeRAM     = (CPU_INT32U  )sizeof(OSCfg_TickWheel);
 
+OS_PRIO        const  OSCfg_EdfSchedPrio         = (OS_PRIO     )OS_CFG_EDF_SCHED_PRIO;
 
 #if (OS_CFG_TMR_EN > 0u)
 OS_PRIO        const  OSCfg_TmrTaskPrio          = (OS_PRIO     )OS_CFG_TMR_TASK_PRIO;
@@ -287,6 +288,8 @@ void  OSCfg_Init (void)
     p_temp = (void const *)&OSCfg_TickTaskStkSizeRAM;
     p_temp = (void const *)&OSCfg_TickWheelSize;
     p_temp = (void const *)&OSCfg_TickWheelSizeRAM;
+
+    p_temp = (void const *)&OSCfg_EdfSchedPrio;
 
 #if (OS_CFG_TMR_EN > 0u)
     p_temp = (void const *)&OSCfg_TmrTaskPrio;
