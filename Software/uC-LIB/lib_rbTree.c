@@ -15,6 +15,7 @@
 
 /********************************************INCLUDE FILES***********************************************/
 #include "lib_rbTree.h"
+#include "lib_tree.h"
 
 /********************************************LOCAL DEFINES***********************************************/
 
@@ -35,7 +36,6 @@ void	rotRight        (Node* p_n);
 void	insertRec		(Node* p_root, Node* p_n);
 void	repairTree		(Node* p_n);
 void	replaceNode		(Node* p_del, Node* p_new);
-Node*	findMin			(Node* p_n);
 void	helpDelete123	(Node* p_n);
 void	helpDelete4		(Node* p_n);
 void	helpDelete56	(Node* p_n);
@@ -44,13 +44,13 @@ void	changeNodes		(Node* p_a, Node* p_b);
 
 /*************************************LOCAL CONFIGURATION ERRORS*****************************************/
 
-/********************************************insert()*****************************************************
+/******************************************rbInsert()*****************************************************
  * Description : (1) insert a node into the tree
  * Argument(s) : p_root  pointer to root of the tree
  *               p_n     pointer to node that should be inserted
  * Return(s)   : A pointer to the (new) root of the tree
  *********************************************************************************************************/
-Node* insert    (Node *p_root, Node *p_n){
+Node* rbInsert    (Node *p_root, Node *p_n){
 	insertRec(p_root, p_n);
 	repairTree(p_n);
 
@@ -58,9 +58,10 @@ Node* insert    (Node *p_root, Node *p_n){
 	return getRoot(p_n);
 }
 
-/*****************************************deleteNode()******************************************************
+/***************************************rbDeleteNode()******************************************************
  * Description	: delete a node from the tree
  * Argument(s)	: p_n	pointer to node that should be deleted
+ * Return(s)   : A pointer to the (new) root of the tree
  * Note(s)		: (a) ---
  * 				  (b) there are different cases that can occur
  * 					(b1) n has two children -> replace key with successor's key, delete successor
@@ -73,7 +74,7 @@ Node* insert    (Node *p_root, Node *p_n){
  * 							(+) P - Parent, S - Sibling, S_L/R - Sibling's left/right child
  * 							(+) b - black, r - red, x - black or red
  *********************************************************************************************************/
-Node* deleteNode (Node *p_n){
+Node* rbDeleteNode (Node *p_n){
 	if(0 != p_n->left && 0 !=p_n->right){
 		// case (b1)
 		Node* p_suc = findMin(p_n->right);
@@ -98,16 +99,13 @@ Node* deleteNode (Node *p_n){
 	//TODO eventually need to free the memory of n?
 }
 
-/********************************************cmpKey()******************************************************
- * Description : (1) compares the keys of two nodes
- * 				 (2) returns a-b
- * Argument(s) : p_a/b     pointer to the first/second node
- * Note(s)     : (a) assuming 0!=p_a and 0!=p_b
+/******************************************rbFindMin()*************************************************
+ * Description : (1) finds the minimum for a given node
+ * Argument(s) : p_n	node from where to start the search
  *********************************************************************************************************/
-CPU_INT08S	cmpKey		(Node* p_a, Node* p_b){
-	if(p_a->key < p_b->key) return -1;
-	if(p_a->key > p_b->key) return 1;
-	return 0;
+Node* rbFindMin (Node* p_n){
+    while(p_n!=0 && 0 != p_n->left) p_n = p_n->left;
+	return p_n;
 }
 
 /*********************************************LOCAL FUNCTIONS*******************************************/
@@ -311,15 +309,6 @@ void replaceNode (Node* p_del, Node* p_new){
 	}
 }
 
-/********************************************findMin()*************************************************
- * Description : (1) finds the minimum for a given node
- * Argument(s) : p_n	node from where to start the search
- *********************************************************************************************************/
-Node* findMin (Node* p_n){
-    while(0 != p_n->left) p_n = p_n->left;
-	return p_n;
-}
-
 /********************************************helpDelete123()**********************************************
  * Description	: cases (b2c1), (b2c2): b r x x and (b2c3): b b b b of the deleting function
  *********************************************************************************************************/
@@ -417,7 +406,11 @@ Node*	getRoot			(Node* p_n){
 }
 
 /********************************************changeNodes()**********************************************
- * Description	: changes everything of p_a and p_b except of the key
+ * Description	: equivalent to a change of keys of a and b but maintains identity
+ * 				  The following properties hold:
+ * 					(1) the keys (of a and b) change position in the tree
+ * 					(2) for each position in the tree: 
+ * 							- color, parent, left, right remain the same
  *********************************************************************************************************/
 void	changeNodes		(Node* p_a, Node* p_b){
 	//a is child of b?

@@ -31,6 +31,7 @@
 */
 
 #include <os.h>
+#include <stdio.h>
 
 #ifdef VSC_INCLUDE_SOURCE_FILE_NAMES
 const  CPU_CHAR  *os_tick__c = "$Id: $";
@@ -498,6 +499,14 @@ void  OS_TickListUpdate (void)
             done  = DEF_TRUE;
         }
     }
+    //TODO Where exactly should this be done? inside the critical section?
+    // After the timing measurements?
+    #ifdef DEBUG
+        fprintf(stdout, "%s", "In TickTask\n");
+    #endif
+    // periodic task processing
+    OSRecTaskListUpdate();
+
     ts_end = OS_TS_GET() - ts_start;                                   /* Measure execution time of tick task         */
     if (ts_end > OSTickTaskTimeMax) {
         OSTickTaskTimeMax = ts_end;
