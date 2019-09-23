@@ -73,4 +73,8 @@
 #define  OS_CFG_TMR_TASK_STK_SIZE        128u               /* Stack size (number of CPU_STK elements)                */
 #define  OS_CFG_TMR_WHEEL_SIZE            13u               /* Number of 'spokes' in timer wheel; SHOULD be prime     */
 
+
+                                                            /* ------------------- EDF-Scheduler --------------------- */
+#define  OS_CFG_EDF_SCHED_PRIO		OS_CFG_PRIO_MAX/2		/* Priority                                               */
+
 #endif

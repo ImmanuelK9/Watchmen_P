@@ -31,6 +31,7 @@
 */
 
 #include  <os.h>
+#include  <os_edf.h>
 
 #ifdef VSC_INCLUDE_SOURCE_FILE_NAMES
 const  CPU_CHAR  *os_core__c = "$Id: $";
@@ -371,7 +372,8 @@ void  OSSched (void)
 
     CPU_INT_DIS();
     OSPrioHighRdy   = OS_PrioGetHighest();                  /* Find the highest priority ready                        */
-    OSTCBHighRdyPtr = OSRdyList[OSPrioHighRdy].HeadPtr;
+    if(OSCfg_EdfSchedPrio == OSPrioHighRdy) OSEdfSched();   /* Are tasks with deadline having highest priority?       */
+    else OSTCBHighRdyPtr = OSRdyList[OSPrioHighRdy].HeadPtr;/* No, then proceed normally                              */
     if (OSTCBHighRdyPtr == OSTCBCurPtr) {                   /* Current task is still highest priority task?           */
         CPU_INT_EN();                                       /* Yes ... no need to context switch                      */
         return;

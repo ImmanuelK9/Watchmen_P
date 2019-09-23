@@ -1263,6 +1263,8 @@ extern  CPU_INT32U    const OSCfg_TickTaskStkSizeRAM;
 extern  OS_OBJ_QTY    const OSCfg_TickWheelSize;
 extern  CPU_INT32U    const OSCfg_TickWheelSizeRAM;
 
+extern	OS_PRIO		  const OSCfg_EdfSchedPrio;
+
 extern  OS_PRIO       const OSCfg_TmrTaskPrio;
 extern  OS_RATE_HZ    const OSCfg_TmrTaskRate_Hz;
 extern  CPU_STK     * const OSCfg_TmrTaskStkBasePtr;

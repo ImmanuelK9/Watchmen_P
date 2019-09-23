@@ -30,20 +30,23 @@
 
 /*************************************LOCAL CONFIGURATION ERRORS*****************************************/
 
-/********************************************<function_name>**********************************************
- * Description	: 
- * Argument(s)	: 
- * Return(s)	: 
- * Note(s)		:
+/********************************************OSEdfSched()**********************************************
+ * Description	: Scheduler that manages all tasks having a deadline
+ * Note(s)		: (1) should only be called inside of OS_CRITICAL sections
  *********************************************************************************************************/
-
+void    OSEdfSched              (void){
+    Node *p_toSchedule = findMin(OSEdfRdyList);
+    OSTCBHighRdyPtr = p_toSchedule->info->tcbPtr;
+}
 
 void    OS_EdfRdyListInsert     (Node *p_n){
+    OS_PrioInsert(OSCfg_EdfSchedPrio);
     OSEdfRdyList = insert(OSEdfRdyList, p_n);
 }
 
 void    OS_EdfRdyListRemove     (Node *p_n){
     OSEdfRdyList = delete(p_n);
+    if (0 == OSEdfRdyList) OS_PrioRemove(OSCfg_EdfSchedPrio);
 }
 
 /*********************************************LOCAL FUNCTIONS********************************************/
