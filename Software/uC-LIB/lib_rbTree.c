@@ -77,13 +77,13 @@ Node* rbInsert    (Node *p_root, Node *p_n){
 Node* rbDeleteNode (Node *p_n){
 	if(0 != p_n->left && 0 !=p_n->right){
 		// case (b1)
-		Node* p_suc = findMin(p_n->right);
+		Node* p_suc = rbFindMin(p_n->right);
 		
 		//p_n->key = p_suc->key;
 		//return deleteNode(p_suc);
         //normally one could just change the keys but to preserve identity, we completely change nodes
 		changeNodes(p_n, p_suc);
-		return deleteNode(p_n);
+		return rbDeleteNode(p_n);
 	} else{
 		// case (b2)
 		Node* p_child = (0 == p_n->right) ? p_n->left : p_n->right;

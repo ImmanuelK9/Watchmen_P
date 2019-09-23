@@ -16,6 +16,7 @@
 #include <os.h>
 #include <lib_tree.h>
 #include <stdio.h>
+#include <os_edf.h>
 
 /********************************************LOCAL DEFINES***********************************************/
 
@@ -191,8 +192,7 @@ void OSRecTaskListUpdate (void){
 
 		//Step 1 Make task ready to run
 		
-		/*p_min->info->tcbPtr->TaskState = OS_TASK_STATE_RDY;
-		OS_RdyListInsert(p_min->info->tcbPtr);    */                        /* Insert the task in the ready list                      */
+		p_min->info->tcbPtr->TaskState = OS_TASK_STATE_RDY;
 		
 		//orientate at OSTaskCreate, many (unused) parts got left out for better overview
 		//=====================
@@ -267,6 +267,9 @@ void OSRecTaskListUpdate (void){
 				OS_CRITICAL_ENTER();
 				OS_PrioInsert(p_tcb->Prio);
 				OS_RdyListInsertTail(p_tcb);
+				
+				//substitute in order to use edf scheduler
+				//OS_EdfRdyListInsert(p_min);
 
 			#if OS_CFG_DBG_EN > 0u
 				OS_TaskDbgListAdd(p_tcb);
@@ -344,7 +347,8 @@ CPU_STK  *OSRecTaskStkInit (OS_TASK_PTR    p_task,
  * Description 	:	Creates a periodic task
  * Note(s)		:	largely copied from OSTaskCreate but this
  * 						(1) does not put the task into ready Q -> does not get scheduled directly
- * 						(2) uses another TaskStkInit function
+ * 						(2) uses another TaskStkInit function / this may be omitted
+ * 						(3) ALWAYS uses OSCfg_EdfSchedPrio as prio !! TODO
  *********************************************************************************************************/
 void  OSTaskCreateMod (OS_TCB        *p_tcb,
                     CPU_CHAR      *p_name,
@@ -466,7 +470,7 @@ void  OSTaskCreateMod (OS_TCB        *p_tcb,
 
 		p_tcb->NamePtr       = p_name;                          /* Save task name                                         */
 
-		p_tcb->Prio          = prio;                            /* Save the task's priority                               */
+		p_tcb->Prio          = prio;              /* Save the task's priority  -------- different           */
 
 		p_tcb->StkPtr        = p_sp;                            /* Save the new top-of-stack pointer                      */
 		p_tcb->StkLimitPtr   = p_stk_limit;                     /* Save the stack limit pointer                           */
