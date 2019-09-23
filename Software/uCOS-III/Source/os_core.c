@@ -300,7 +300,8 @@ void  OSIntExit (void)
     }
 
     OSPrioHighRdy   = OS_PrioGetHighest();                  /* Find highest priority                                  */
-    OSTCBHighRdyPtr = OSRdyList[OSPrioHighRdy].HeadPtr;     /* Get highest priority task ready-to-run                 */
+    if(OSCfg_EdfSchedPrio == OSPrioHighRdy) OSEdfSched();   /* Are tasks with deadline having highest priority?       */
+    else OSTCBHighRdyPtr = OSRdyList[OSPrioHighRdy].HeadPtr;/* No, then proceed normally                              */
     if (OSTCBHighRdyPtr == OSTCBCurPtr) {                   /* Current task still the highest priority?               */
         CPU_INT_EN();                                       /* Yes                                                    */
         return;
@@ -2354,6 +2355,14 @@ void  OS_RdyListMoveHeadToTail (OS_RDY_LIST  *p_rdy_list)
 
 void  OS_RdyListRemove (OS_TCB *p_tcb)
 {
+    //if the task to remove is a task with deadline
+    //then go to the according datastructure
+    if(OSCfg_EdfSchedPrio == p_tcb->Prio) {
+        OS_TCB_TO_NODE *p_tcbToNode = (OS_TCB_TO_NODE *) p_tcb->ExtPtr;
+        OS_EdfRdyListRemove(p_tcbToNode->edfNode);
+        return;
+    }
+    
     OS_RDY_LIST  *p_rdy_list;
     OS_TCB       *p_tcb1;
     OS_TCB       *p_tcb2;

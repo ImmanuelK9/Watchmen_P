@@ -32,13 +32,17 @@
 
 /*************************************LOCAL CONFIGURATION ERRORS*****************************************/
 
-/********************************************<function_name>**********************************************
- * Description	: 
- * Argument(s)	: 
- * Return(s)	: 
- * Note(s)		:
+/********************************************insert()**********************************************
+ * Description	: Simulates an interface for tree operations
+ * Argument(s)	: see the actual implementations
+ * Return(s)	: see the actual implementations
+ * Note(s)		: (1) p_n != 0 should be guaranteed
  *********************************************************************************************************/
 Node*       insert              (Node *p_root, Node *p_n){
+    if(0 == p_n){
+        fprintf(stdout, "%s", "Tree error - node is null\n");
+        return 0; 
+    }
     switch(p_n->tree){
         case    RBTREE:		return rbInsert(p_root,p_n);
         case    BNRHEAP:	return bhInsert(p_root, p_n); 
@@ -47,8 +51,18 @@ Node*       insert              (Node *p_root, Node *p_n){
     }
 }
 
+/********************************************deleteNode()**********************************************
+ * Description	: Simulates an interface for tree operations
+ * Argument(s)	: see the actual implementations
+ * Return(s)	: see the actual implementations
+ * Note(s)		: (1) p_n != 0 should be guaranteed
+ *********************************************************************************************************/
 Node*       deleteNode          (Node *p_n){
-	switch(p_n->tree){
+	if(0 == p_n){
+        fprintf(stdout, "%s", "Tree error - node is null\n");
+        return 0; 
+    }
+    switch(p_n->tree){
         case    RBTREE:		return rbDeleteNode(p_n);
         case    BNRHEAP:	return bhDeleteNode(p_n); 
 		default:			fprintf(stdout, "%s", "Tree error - unitialized tree type\n");
@@ -56,8 +70,15 @@ Node*       deleteNode          (Node *p_n){
     }
 }
 
+/********************************************findMin()**********************************************
+ * Description	: Simulates an interface for tree operations
+ * Argument(s)	: see the actual implementations
+ * Return(s)	: see the actual implementations
+ * Note(s)		: (1) p_n == 0 is allowed
+ *********************************************************************************************************/
 Node*	    findMin			    (Node* p_n){
-	switch(p_n->tree){
+	if(0 == p_n) return 0;      //this could happen if findMin is called on an empty tree
+    switch(p_n->tree){
         case    RBTREE:		return rbFindMin(p_n);
         case    BNRHEAP:	return bhFindMin(p_n); 
 		default:			fprintf(stdout, "%s", "Tree error - unitialized tree type\n");

@@ -16,6 +16,7 @@
 #include <os.h>
 #include <lib_tree.h>
 #include <stdio.h>
+#include <os_edf.h>
 
 /********************************************LOCAL DEFINES***********************************************/
 
@@ -63,6 +64,8 @@ void		OSRecTaskFinishHelp(void);
  *                	//additional data for recursion
  * 					p_recListNode		pointer to Node that is used for the RecList
  * 				  	p_recListKey		pointer to key datastructure that is used as an info in the node
+ * 					p_edfRdyListNode	pointer to Node that is used for the EdfRdyList
+ * 					p_edfRdyListKey		pointer to key datastructure that is used as an info in the node
  * 				  	period				periodicity of this task
  *
  *
@@ -84,8 +87,10 @@ void OSRecTaskCreate 	(OS_TCB                *p_tcb,
                          OS_ERR                *p_err,
 						 //additional data for recursion
 						 Node				   *p_recListNode,
-						 OS_REC_LIST_KEY	   *p_recListKey,
-						 CPU_INT32U				period			 
+						 OS_NODE_INFO		   *p_recListKey,
+						 Node				   *p_edfRdyListNode,
+						 OS_NODE_INFO		   *p_edfRdyListKey,
+						 CPU_INT32U				period	 			 
 						 ){
 	//TODO
 	//create task similar to OSTaskCreate?
@@ -93,10 +98,18 @@ void OSRecTaskCreate 	(OS_TCB                *p_tcb,
 	p_recListKey->tcbPtr=p_tcb;
 	//should be changed later when schedule together functionality is implemented
 	p_recListKey->TickCtrMatch = OSTickCtr + period;
-	
+
+	p_edfRdyListKey->tcbPtr=p_tcb;
+
 	p_recListNode->info=p_recListKey;
 	p_recListNode->key = p_recListNode->info->TickCtrMatch;
 	p_recListNode->tree = RECURSIONTREE;
+
+	OS_TCB_TO_NODE *p_tcbToNode = (OS_TCB_TO_NODE *) p_ext;
+	p_tcbToNode->recNode = p_recListNode;
+	p_tcbToNode->edfNode = p_edfRdyListNode;
+
+	p_edfRdyListNode->info = p_recListKey;
 
 	OSRecList = insert(OSRecList, p_recListNode);
 
@@ -191,8 +204,7 @@ void OSRecTaskListUpdate (void){
 
 		//Step 1 Make task ready to run
 		
-		/*p_min->info->tcbPtr->TaskState = OS_TASK_STATE_RDY;
-		OS_RdyListInsert(p_min->info->tcbPtr);    */                        /* Insert the task in the ready list                      */
+		p_min->info->tcbPtr->TaskState = OS_TASK_STATE_RDY;
 		
 		//orientate at OSTaskCreate, many (unused) parts got left out for better overview
 		//=====================
@@ -244,7 +256,7 @@ void OSRecTaskListUpdate (void){
 
 			p_tcb->NamePtr       = p_name;                          /* Save task name                                         */
 
-			p_tcb->Prio          = prio;                            /* Save the task's priority                               */
+			p_tcb->Prio          = OSCfg_EdfSchedPrio;              /* Save the task's priority  ----!!!different                      */
 
 			p_tcb->StkPtr        = p_sp;                            /* Save the new top-of-stack pointer                      */
 			p_tcb->StkLimitPtr   = p_stk_limit;                     /* Save the stack limit pointer                           */
@@ -265,8 +277,14 @@ void OSRecTaskListUpdate (void){
 				OSTaskCreateHook(p_tcb);                                /* Call user defined hook                                 */
 																		/* --------------- ADD TASK TO READY LIST --------------- */
 				OS_CRITICAL_ENTER();
-				OS_PrioInsert(p_tcb->Prio);
-				OS_RdyListInsertTail(p_tcb);
+				//OS_PrioInsert(p_tcb->Prio);
+				//OS_RdyListInsertTail(p_tcb);
+				
+				//substitute above to below in order to use edf scheduler
+				OS_TCB_TO_NODE *tcbToNode =  (OS_TCB_TO_NODE *) (p_min->info->tcbPtr->ExtPtr);
+				tcbToNode->edfNode->key = OSTickCtr + p_min->info->period;	/* set Deadline */
+				tcbToNode->edfNode->info->TickCtrMatch = OSTickCtr + p_min->info->period;
+				OS_EdfRdyListInsert(tcbToNode->edfNode);
 
 			#if OS_CFG_DBG_EN > 0u
 				OS_TaskDbgListAdd(p_tcb);
@@ -344,7 +362,8 @@ CPU_STK  *OSRecTaskStkInit (OS_TASK_PTR    p_task,
  * Description 	:	Creates a periodic task
  * Note(s)		:	largely copied from OSTaskCreate but this
  * 						(1) does not put the task into ready Q -> does not get scheduled directly
- * 						(2) uses another TaskStkInit function
+ * 						(2) uses another TaskStkInit function / this may be omitted
+ * 						(3) ALWAYS uses OSCfg_EdfSchedPrio as prio !! TODO
  *********************************************************************************************************/
 void  OSTaskCreateMod (OS_TCB        *p_tcb,
                     CPU_CHAR      *p_name,
@@ -466,7 +485,7 @@ void  OSTaskCreateMod (OS_TCB        *p_tcb,
 
 		p_tcb->NamePtr       = p_name;                          /* Save task name                                         */
 
-		p_tcb->Prio          = prio;                            /* Save the task's priority                               */
+		p_tcb->Prio          = OSCfg_EdfSchedPrio;              /* Save the task's priority  -------- different           */
 
 		p_tcb->StkPtr        = p_sp;                            /* Save the new top-of-stack pointer                      */
 		p_tcb->StkLimitPtr   = p_stk_limit;                     /* Save the stack limit pointer                           */
