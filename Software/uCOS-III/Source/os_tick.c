@@ -501,7 +501,7 @@ void  OS_TickListUpdate (void)
     }
     //TODO Where exactly should this be done? inside the critical section?
     // After the timing measurements?
-    #ifdef DEBUG
+    #if APP_DEBUG
         fprintf(stdout, "%s", "In TickTask\n");
     #endif
     // periodic task processing
