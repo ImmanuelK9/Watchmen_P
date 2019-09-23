@@ -13,6 +13,7 @@
 
 
 /********************************************INCLUDE FILES***********************************************/
+#include <os_edf.h>
 #include <os.h>
 #include <lib_tree.h>
 
@@ -45,7 +46,7 @@ void    OS_EdfRdyListInsert     (Node *p_n){
 }
 
 void    OS_EdfRdyListRemove     (Node *p_n){
-    OSEdfRdyList = delete(p_n);
+    OSEdfRdyList = deleteNode(p_n);
     if (0 == OSEdfRdyList) OS_PrioRemove(OSCfg_EdfSchedPrio);
 }
 
