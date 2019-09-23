@@ -55,8 +55,38 @@
 
 #define TIMERDIV                      (BSP_CPUClkFreq() / (CPU_INT32U)OSCfg_TickRate_Hz)
 
-#define DEBUG 0
+#define APP_DEBUG 0
 
+/************************************allocStaticMemWDeadline()*********************************************
+ * Description 	:	Use this macro to allocate all needed structures at once
+ * Argument(s)	: 	name		name of the task, without quotation marks
+ *					stkSize		the desired stack size for this task
+ * Note(s)		:	Example usage: allocStaticMemWDeadline(exampleTask, 256);
+ *********************************************************************************************************/
+#define allocStaticMemWDeadline(name, stkSize)				\
+			static OS_TCB			name##TCB;			\
+			static CPU_STK			name##Stk[stkSize];	\
+			static Node				name##Node;			\
+			static OS_REC_LIST_KEY	name##RecListKey;
+
+/************************************macroOSRecTaskCreate()*********************************************
+ * Description 	:	Use this macro to create a periodic task
+ * Argument(s)	: 	name		name of the task, without quotation marks
+ *					arg			pointer to arg
+ *					prio		
+ *					stkSize
+ *					stkLimitDivider		stack limit will be calculated to stkSize/stkLimitDivider
+ *					extPtr
+ *					period
+ * Note(s)		:	Example usage: allocStaticMemWDeadline(exampleTask, 256);
+ *********************************************************************************************************/
+#define macroOSRecTaskCreate(name, arg, prio, stkSize, stkLimitDivider, extPtr, period)			\
+			OSRecTaskCreate((OS_TCB *) &##name##TCB, (CPU_CHAR *) #name,						\
+				(OS_TASK_PTR) name, (void *) arg, (OS_PRIO) prio, (CPU_STK *) &##name##Stk[0],	\
+				(CPU_STK_SIZE) stkSize / stkLimitDivider, (CPU_STK_SIZE) stkSize,				\
+				(OS_MSG_QTY) 0u, (OS_TICK) 0u, (void *) extPtr,									\
+				(OS_OPT)(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),							\
+				(OS_ERR *) &err, &##name##Node, &##name##RecListKey, period)
 
 /*
 *********************************************************************************************************
@@ -74,10 +104,7 @@ static  OS_TCB       AppTaskTwoTCB;
 static  CPU_STK      AppTaskTwoStk[APP_TASK_TWO_STK_SIZE];
 
 #define  APP_TASK_THREE_STK_SIZE                      128u
-static  OS_TCB       AppTaskThreeTCB;
-static  CPU_STK      AppTaskThreeStk[APP_TASK_THREE_STK_SIZE];
-static  Node         AppTaskThreeNode;
-static  OS_REC_LIST_KEY AppTaskThreeRecListKey;
+allocStaticMemWDeadline(AppTaskThree, APP_TASK_THREE_STK_SIZE);
 
 CPU_INT32U      iCnt = 0;
 CPU_INT08U      Left_tgt;
@@ -191,8 +218,8 @@ static  void  AppTaskStart (void  *p_arg)
 
     //OSTaskCreate((OS_TCB     *)&AppTaskOneTCB, (CPU_CHAR   *)"App Task One", (OS_TASK_PTR ) AppTaskOne, (void       *) 0, (OS_PRIO     ) APP_TASK_ONE_PRIO, (CPU_STK    *)&AppTaskOneStk[0], (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *)(CPU_INT32U) 1, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
     //OSTaskCreate((OS_TCB     *)&AppTaskTwoTCB, (CPU_CHAR   *)"App Task Two", (OS_TASK_PTR ) AppTaskTwo, (void       *) 0, (OS_PRIO     ) APP_TASK_TWO_PRIO, (CPU_STK    *)&AppTaskTwoStk[0], (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *) (CPU_INT32U) 2, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
-    OSRecTaskCreate((OS_TCB     *)&AppTaskThreeTCB, (CPU_CHAR   *)"App Task Three", (OS_TASK_PTR ) AppTaskThree, (void       *) 0, 4, (CPU_STK    *)&AppTaskThreeStk[0], (CPU_STK_SIZE) APP_TASK_THREE_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_THREE_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *) (CPU_INT32U) 3, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err, &AppTaskThreeNode, &AppTaskThreeRecListKey, 5000);
-
+    //OSRecTaskCreate((OS_TCB     *)&AppTaskThreeTCB, (CPU_CHAR   *)"App Task Three", (OS_TASK_PTR ) AppTaskThree, (void       *) 0, 4, (CPU_STK    *)&AppTaskThreeStk[0], (CPU_STK_SIZE) APP_TASK_THREE_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_THREE_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *) (CPU_INT32U) 3, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err, &AppTaskThreeNode, &AppTaskThreeRecListKey, 5000);
+	macroOSRecTaskCreate(AppTaskThree, 0, 4, APP_TASK_THREE_STK_SIZE, 10u, 3, 5000);
     
     /* Delete this task */
     OSTaskDel((OS_TCB *)0, &err);
@@ -274,7 +301,7 @@ static  void  AppTaskThree (void  *p_arg)
     //OSRecTaskFinish(&AppTaskThreeTCB, &err);
     //fprintf(stdout, "%s", "hallo\n");
     //while(OSTickCtr < 100);
-    #ifdef DEBUG
+    #if APP_DEBUG
         fprintf(stdout, "%s", "In AppTaskThree\n");
     #endif
     OSTaskDel((OS_TCB *)0, &err);

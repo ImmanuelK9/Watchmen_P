@@ -168,7 +168,7 @@ void OSRecTaskFinish (OS_TCB *p_tcb1, OS_ERR *p_err){
 	//TODO
 	//what to do from here?? ----------------------------
 	p_tcb->TaskState = (OS_STATE)OS_TASK_STATE_DEL;
-	#ifdef DEBUG
+	#if APP_DEBUG
 		fprintf(stdout, "%s", "In OSTaskRecFinish\n");
 	#endif
 	OS_CRITICAL_EXIT_NO_SCHED();
