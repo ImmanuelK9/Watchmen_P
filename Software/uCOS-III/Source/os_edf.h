@@ -15,6 +15,11 @@
 #define OS_EDF_MODULE_PRESENT
 
 /********************************************INCLUDE FILES***********************************************/
+#include <os.h>
+#include <lib_tree.h>
+#ifdef DEBUG
+	#include <stdio.h>
+#endif
 
 /***********************************************EXTERNS**************************************************/
 
@@ -27,6 +32,10 @@
 /***********************************************MACRO'S**************************************************/
 
 /******************************************FUNCTION PROTOTYPES*******************************************/
+void    OSEdfSched              (void);
+//void    OS_EdfRdyListInit       (void);
+void    OS_EdfRdyListInsert     (Node *p_n);
+void    OS_EdfRdyListRemove     (Node *p_n);
 
 /******************************************CONFIGURATION ERRORS******************************************/
 
