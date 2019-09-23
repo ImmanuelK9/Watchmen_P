@@ -135,6 +135,12 @@ static  void        AppTaskOne                   (void  *p_arg);
 static  void        AppTaskTwo                   (void  *p_arg);
 static  void        AppTaskThree                 (void  *p_arg);
 
+static	void		LEDBlink					(void *p_arg);
+static	void		moveForward					(void *p_arg);
+static	void		moveBackward				(void *p_arg);
+static	void		leftTurn					(void *p_arg);
+static	void		rightTurn					(void *p_arg);
+static 	void		move						(tSide dir);
 
 /*
 *********************************************************************************************************

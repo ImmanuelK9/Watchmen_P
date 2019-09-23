@@ -1147,6 +1147,7 @@ OS_EXT            OS_OBJ_QTY             OSQQty;                      /* Number 
                                                                       /* READY LIST --------------------------------- */
 OS_EXT            OS_RDY_LIST            OSRdyList[OS_CFG_PRIO_MAX];  /* Table of tasks ready to run                  */
 OS_EXT			  Node					*OSRecList;
+OS_EXT			  Node					*OSEdfRdyList;					  /* List for tasks with deadline ready to run	  */
 
 
 #ifdef OS_SAFETY_CRITICAL_IEC61508
@@ -1261,6 +1262,8 @@ extern  CPU_STK_SIZE  const OSCfg_TickTaskStkSize;
 extern  CPU_INT32U    const OSCfg_TickTaskStkSizeRAM;
 extern  OS_OBJ_QTY    const OSCfg_TickWheelSize;
 extern  CPU_INT32U    const OSCfg_TickWheelSizeRAM;
+
+extern	OS_PRIO		  const OSCfg_EdfSchedPrio;
 
 extern  OS_PRIO       const OSCfg_TmrTaskPrio;
 extern  OS_RATE_HZ    const OSCfg_TmrTaskRate_Hz;
