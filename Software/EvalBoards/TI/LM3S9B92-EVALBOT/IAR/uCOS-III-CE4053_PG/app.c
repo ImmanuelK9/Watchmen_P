@@ -247,6 +247,8 @@ static  void  AppTaskStart (void  *p_arg)
 	//macroOSRecTaskCreate(APPMoveB, moveBackward, 0, 4, APP_MOVE_B_STK_SIZE, 10u, 17000);
 	//macroOSRecTaskCreate(APPMoveL, leftTurn, 0, 4, APP_MOVE_L_STK_SIZE, 10u, 25000);
 	//macroOSRecTaskCreate(APPMoveR, rightTurn, 0, 4, APP_MOVE_R_STK_SIZE, 10u, 47000);
+
+	OSSyncRelease();
     
     /* Delete this task */
     OSTaskDel((OS_TCB *)0, &err);
@@ -306,15 +308,9 @@ static  void  AppTaskTwo (void  *p_arg)
 
 }
 
-static  void  AppTaskThree (void  *p_arg)
-{
+static  void  AppTaskThree (void  *p_arg){
     OS_ERR      err;
     CPU_INT32U  i,k,j=0;
-   
-    /*for(i=0; i <(ONESECONDTICK); i++)
-    {
-      j = ((i * 2) + j);
-    }*/
     
     BSP_LED_Off(0u);
     for(k=0; k<3; k++)
