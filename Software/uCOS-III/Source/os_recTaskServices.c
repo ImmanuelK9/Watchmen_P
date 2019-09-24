@@ -246,7 +246,6 @@ void OSRecTaskListUpdate (void){
 				
 				//substitute above to below in order to use edf scheduler
 				OS_TCB_TO_NODE *tcbToNode =  (OS_TCB_TO_NODE *) (p_min->info->tcbPtr->ExtPtr);
-				CPU_INT32U oldKey = tcbToNode->edfNode->key;
 				tcbToNode->edfNode->key = OSTickCtr + p_min->info->period;	/* set Deadline */
 				tcbToNode->edfNode->info->TickCtrMatch = tcbToNode->edfNode->key;
 				if(tcbToNode->edfNode->key < OSTickCtr) 					/* Overflow?? */
@@ -271,7 +270,7 @@ void OSRecTaskListUpdate (void){
 		//Step 2 Manage the RecList
 		//delete old entry and add next entry in RecList
 		OSRecList = deleteNode(p_min);
-		oldKey = p_min->info->TickCtrMatch;
+		CPU_INT32U oldKey = p_min->info->TickCtrMatch;
 		p_min->info->TickCtrMatch += p_min->info->period;
 		p_min->key = p_min->info->TickCtrMatch;
 		if(p_min->key < oldKey)
