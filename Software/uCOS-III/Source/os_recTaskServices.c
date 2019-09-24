@@ -69,10 +69,11 @@ void		OSRecTaskFinishHelp(void);
  * 					p_edfRdyListNode	pointer to Node that is used for the EdfRdyList
  * 					p_edfRdyListKey		pointer to key datastructure that is used as an info in the node
  * 				  	period				periodicity of this task
- *
+ * 											0		aperiodic task with deadline
+ * 											>0		periodic task with period
  *
  * Returns		: A pointer to the TCB of the task created.  This pointer must be used as an ID (i.e handle) to the task.
- * Notes		:	(1) TODO add functionality to schedule together
+ * Notes		:
 ***********************************************************************************************************/
 void OSRecTaskCreate 	(OS_TCB                *p_tcb,
                          CPU_CHAR              *p_name,
@@ -267,9 +268,11 @@ void OSRecTaskListUpdate (void){
 		//Step 2 Manage the RecList
 		//delete old entry and add next entry in RecList
 		OSRecList = deleteNode(p_min);
-		p_min->info->TickCtrMatch += p_min->info->period;
+		if(0 != p_min->info->period){											/* Only reinsert when period != 0 <=> periodic     */	
+			p_min->info->TickCtrMatch += p_min->info->period;
 		p_min->key = p_min->info->TickCtrMatch;
 		OSRecList = insert(OSRecList, p_min);
+		}
 
 		p_min = findMin(OSRecList);
 	}
