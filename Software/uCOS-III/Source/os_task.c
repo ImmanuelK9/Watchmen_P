@@ -86,6 +86,18 @@ void  OSTaskChangePrio (OS_TCB   *p_tcb,
         return;
     }
 
+    if (p_tcb->Prio != OSCfg_EdfSchedPrio &&                /* Cannot set to EDF Task priority                        */
+         prio_new == OSCfg_EdfSchedPrio){
+        *p_err = OS_ERR_PRIO_INVALID;
+        return;
+    }
+
+    if (p_tcb->Prio == OSCfg_EdfSchedPrio &&                /* Cannot set EDF Task priority to different one          */
+         prio_new != OSCfg_EdfSchedPrio){
+        *p_err = OS_ERR_PRIO_INVALID;
+        return;
+    }
+
     if (p_tcb == (OS_TCB *)0) {                             /* See if want to change priority of 'self'               */
         CPU_CRITICAL_ENTER();
         p_tcb = OSTCBCurPtr;
