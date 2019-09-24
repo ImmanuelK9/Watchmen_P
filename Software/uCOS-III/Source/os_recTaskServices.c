@@ -270,8 +270,8 @@ void OSRecTaskListUpdate (void){
 		OSRecList = deleteNode(p_min);
 		if(0 != p_min->info->period){											/* Only reinsert when period != 0 <=> periodic     */	
 			p_min->info->TickCtrMatch += p_min->info->period;
-		p_min->key = p_min->info->TickCtrMatch;
-		OSRecList = insert(OSRecList, p_min);
+			p_min->key = p_min->info->TickCtrMatch;
+			OSRecList = insert(OSRecList, p_min);
 		}
 
 		p_min = findMin(OSRecList);
