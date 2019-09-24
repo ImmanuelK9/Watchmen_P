@@ -1153,12 +1153,14 @@ OS_EXT            OS_OBJ_QTY             OSQQty;                      /* Number 
 #endif
 
 
-
                                                                       /* READY LIST --------------------------------- */
 OS_EXT            OS_RDY_LIST            OSRdyList[OS_CFG_PRIO_MAX];  /* Table of tasks ready to run                  */
-OS_EXT			  Node					*OSRecList;
-OS_EXT			  Node					*OSEdfRdyList;					  /* List for tasks with deadline ready to run	  */
 
+                                                                      /* PERIODIC & EDF ----------------------------- */
+OS_EXT			  Node					*OSRecList;                   /* List for periodic tasks to keep track of next release time*/
+OS_EXT			  Node					*OSEdfRdyList;			      /* List for tasks with deadline ready to run	  */
+OS_EXT            CPU_BOOLEAN			OSSyncReleaseFlag;			  /* Flag used for synchronous release of periodic tasks */
+OS_EXT			  CPU_INT32U			OSSyncReleaseTime;			  /* Time of the first synchronous release		  */
 
 #ifdef OS_SAFETY_CRITICAL_IEC61508
 OS_EXT            CPU_BOOLEAN            OSSafetyCriticalStartFlag;   /* Flag indicating that all init. done          */
@@ -1763,6 +1765,8 @@ void          OSRecTaskCreate			(OS_TCB                *p_tcb,
 										 OS_NODE_INFO		   *p_edfRdyListKey,
 										 CPU_INT32U				period	 
 										 );
+
+void			OSSyncRelease			(void);
 
 void          OSRecTaskFinish           (OS_TCB                *p_tcb,
                                          OS_ERR                *p_err);
