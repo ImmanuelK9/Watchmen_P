@@ -105,10 +105,12 @@ void OSRecTaskCreate 	(OS_TCB                *p_tcb,
 	p_recListNode->info				= p_recListKey;
 	p_recListNode->key 				= p_recListNode->info->TickCtrMatch;
 	p_recListNode->overflowState 	= OSTickCtrOverflowState;
+	p_recListNode->inTree			= 0;
 	p_recListNode->tree 			= RECURSIONTREE;
 
-	p_edfRdyListNode->info = p_edfRdyListKey;
-	p_edfRdyListNode->tree = EDFTREE;
+	p_edfRdyListNode->info			= p_edfRdyListKey;
+	p_edfRdyListNode->inTree		= 0;
+	p_edfRdyListNode->tree			= EDFTREE;
 
 	OS_TCB_TO_NODE *p_tcbToNode 	= (OS_TCB_TO_NODE *) p_ext;
 	p_tcbToNode->recNode 			= p_recListNode;
@@ -164,7 +166,7 @@ void OSRecTaskListUpdate (void){
 	Node* p_min = findMin(OSRecList);
 
 	//use >= for safety, if intr missed
-while(p_min!=0 &&															/* Process each TCB that expires               */
+	while(p_min!=0 &&															/* Process each TCB that expires               */
 		OSTickCtrOverflowState == p_min->overflowState &&
 		OSTickCtr >= OSSyncReleaseTime + p_min->info->TickCtrMatch){
 
@@ -210,12 +212,7 @@ while(p_min!=0 &&															/* Process each TCB that expires               *
 				p_stk_limit = p_stk_base + (stk_size - 1u) - stk_limit;
 			#endif
 			//different
-			p_sp = OSRecTaskStkInit(p_task,
-								p_arg,
-								p_stk_base,
-								p_stk_limit,
-								stk_size,
-								opt);
+			p_sp = OSRecTaskStkInit(p_task,	p_arg, p_stk_base, p_stk_limit, stk_size, opt);
 
 																	/* -------------- INITIALIZE THE TCB FIELDS ------------- */
 			p_tcb->TaskEntryAddr = p_task;                          /* Save task entry point address                          */
@@ -283,6 +280,21 @@ while(p_min!=0 &&															/* Process each TCB that expires               *
 
 		p_min = findMin(OSRecList);
 	}
+}
+
+/******************************************OSRecTaskDelete()*********************************************
+ * Description 	:	Delete a task that was created with OSRecTaskCreate()
+ * Note(s)		:	
+ *********************************************************************************************************/
+void OSRecTaskDelete(OS_TCB *p_tcb){
+	if(0 == p_tcb) return;
+	
+	OS_TCB_TO_NODE *tcbToNode = (OS_TCB_TO_NODE *) p_tcb->ExtPtr;
+	if(tcbToNode->recNode->inTree) OSRecList = deleteNode(tcbToNode->recNode);
+	//the edfNode gets removed if it is on the edf (ready) list by OSTaskDel
+
+	OS_ERR err;
+	OSTaskDel(p_tcb, &err);
 }
 
 /*********************************************LOCAL FUNCTIONS********************************************/

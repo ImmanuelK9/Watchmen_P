@@ -112,6 +112,9 @@ static  CPU_STK      AppTaskTwoStk[APP_TASK_TWO_STK_SIZE];
 #define  APP_TASK_THREE_STK_SIZE                      128u
 allocStaticMemWDeadline(AppTaskThree, APP_TASK_THREE_STK_SIZE);
 
+#define	APP_DELETE_LED_TASK	128u
+allocStaticMemWDeadline(DeleteLEDTask, APP_DELETE_LED_TASK);
+
 #define APP_LED_BLINK_STK_SIZE	128u
 allocStaticMemWDeadline(APPLED, APP_LED_BLINK_STK_SIZE);
 
@@ -155,6 +158,7 @@ static  void        AppTaskStart                 (void  *p_arg);
 static  void        AppTaskOne                   (void  *p_arg);
 static  void        AppTaskTwo                   (void  *p_arg);
 static  void        AppTaskThree                 (void  *p_arg);
+static	void		DeleteLEDTask				 (void  *p_arg);
 
 static	void		LEDBlink					(void *p_arg);
 static	void		moveForward					(void *p_arg);
@@ -202,7 +206,6 @@ int  main (void)
     OSStart(&err);                                              /* Start multitasking (i.e. give control to uC/OS-III). */
 }
 
-
 /*
 *********************************************************************************************************
 *                                          STARTUP TASK
@@ -240,6 +243,9 @@ static  void  AppTaskStart (void  *p_arg)
     //OSTaskCreate((OS_TCB     *)&AppTaskOneTCB, (CPU_CHAR   *)"App Task One", (OS_TASK_PTR ) AppTaskOne, (void       *) 0, (OS_PRIO     ) APP_TASK_ONE_PRIO, (CPU_STK    *)&AppTaskOneStk[0], (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *)(CPU_INT32U) 1, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
     //OSTaskCreate((OS_TCB     *)&AppTaskTwoTCB, (CPU_CHAR   *)"App Task Two", (OS_TASK_PTR ) AppTaskTwo, (void       *) 0, (OS_PRIO     ) APP_TASK_TWO_PRIO, (CPU_STK    *)&AppTaskTwoStk[0], (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *) (CPU_INT32U) 2, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
 	
+	//this task should only be enabled, if APPLED is also used.
+	OSTaskCreate((OS_TCB     *)&DeleteLEDTaskTCB, (CPU_CHAR   *)"Delete LED", (OS_TASK_PTR ) DeleteLEDTask, (void       *) 0, (OS_PRIO     ) OSCfg_EdfSchedPrio+1, (CPU_STK    *)&DeleteLEDTaskStk[0], (CPU_STK_SIZE) APP_DELETE_LED_TASK / 10u, (CPU_STK_SIZE) APP_DELETE_LED_TASK, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *) (CPU_INT32U) 0, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
+
 	//prio is (should be) ignored by the OS from now on, because periodic => OSCfg_EdfSchedPrio
 	//macroOSRecTaskCreate(AppTaskThree, AppTaskThree, 0, 4, APP_TASK_THREE_STK_SIZE, 10u, 5000);
 	macroOSRecTaskCreate(APPLED, LEDBlink, 0, 4, APP_LED_BLINK_STK_SIZE, 10u, 5000);
@@ -329,6 +335,14 @@ static  void  AppTaskThree (void  *p_arg){
     #endif
     OSTaskDel((OS_TCB *)0, &err);
     //OS tried to delete because there is an "accidental return"
+}
+
+static void DeleteLEDTask(void *p_arg){
+	CPU_INT32U i,j=0;
+	//wait roughly 15 seconds
+	//this is run when there are no deadline tasks left
+	for(i=0; i <15*ONESECONDTICK; i++) j = ((i * 2)+j);
+	OSRecTaskDelete(&APPLEDTCB);
 }
 
 static	void	LEDBlink	(void *p_arg){

@@ -732,6 +732,7 @@ struct node {
     enum	tree	tree;
 	CPU_INT32U		key;
 	CPU_BOOLEAN		overflowState;
+	CPU_BOOLEAN		inTree;
     OS_NODE_INFO 	*info;
 };
 
@@ -1773,8 +1774,9 @@ void			OSSyncRelease			(void);
 void          OSRecTaskFinish           (OS_TCB                *p_tcb,
                                          OS_ERR                *p_err);
 
-/* ------------------------------------------------ INTERNAL FUNCTIONS ---------------------------------------------- */
 void		OSRecTaskListUpdate			(void);
+
+void		OSRecTaskDelete				(OS_TCB *p_tcb);
 
 /*$PAGE*/
 /* ================================================================================================================== */

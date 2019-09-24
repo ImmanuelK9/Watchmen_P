@@ -43,6 +43,11 @@ Node*       insert              (Node *p_root, Node *p_n){
         fprintf(stdout, "%s", "Tree error - node is null\n");
         return 0; 
     }
+    if(p_n->inTree){
+        fprintf(stdout, "%s", "Tree error - inTree flag is already set\n");
+        return 0; 
+    }
+    p_n->inTree = 1;
     switch(p_n->tree){
         case    RBTREE:		return rbInsert(p_root,p_n);
         case    BNRHEAP:	return bhInsert(p_root, p_n); 
@@ -62,6 +67,11 @@ Node*       deleteNode          (Node *p_n){
         fprintf(stdout, "%s", "Tree error - node is null\n");
         return 0; 
     }
+    if(!p_n->inTree){
+        fprintf(stdout, "%s", "Tree error - inTree flag is not set\n");
+        return 0; 
+    }
+    p_n->inTree = 0;
     switch(p_n->tree){
         case    RBTREE:		return rbDeleteNode(p_n);
         case    BNRHEAP:	return bhDeleteNode(p_n); 
