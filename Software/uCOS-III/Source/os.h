@@ -730,7 +730,8 @@ struct node {
     struct	node	*right;
     enum	color	color;
     enum	tree	tree;
-CPU_INT32U			key;
+	CPU_INT32U		key;
+	CPU_BOOLEAN		overflowState;
     OS_NODE_INFO 	*info;
 };
 
@@ -1161,6 +1162,7 @@ OS_EXT			  Node					*OSRecList;                   /* List for periodic tasks to 
 OS_EXT			  Node					*OSEdfRdyList;			      /* List for tasks with deadline ready to run	  */
 OS_EXT            CPU_BOOLEAN			OSSyncReleaseFlag;			  /* Flag used for synchronous release of periodic tasks */
 OS_EXT			  CPU_INT32U			OSSyncReleaseTime;			  /* Time of the first synchronous release		  */
+OS_EXT			  CPU_BOOLEAN			OSTickCtrOverflowState;		  /* Indicate the overflow state of the current time	*/
 
 #ifdef OS_SAFETY_CRITICAL_IEC61508
 OS_EXT            CPU_BOOLEAN            OSSafetyCriticalStartFlag;   /* Flag indicating that all init. done          */

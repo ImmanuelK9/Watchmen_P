@@ -93,9 +93,15 @@ Node*	    findMin			    (Node* p_n){
  * Note(s)     : (a) assuming 0!=p_a and 0!=p_b
  *********************************************************************************************************/
 CPU_INT08S	cmpKey		(Node* p_a, Node* p_b){
-	if(p_a->key < p_b->key) return -1;
-	if(p_a->key > p_b->key) return 1;
-	return 0;
+    if(p_a->overflowState == p_b->overflowState){
+        if(p_a->key < p_b->key) return -1;
+        if(p_a->key > p_b->key) return 1;
+        return 0;
+    } else {
+        if(p_a->overflowState == OSTickCtrOverflowState) return -1;
+        return 1;
+    }
+	
 }
 
 /*********************************************LOCAL FUNCTIONS********************************************/

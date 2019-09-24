@@ -95,23 +95,24 @@ void OSRecTaskCreate 	(OS_TCB                *p_tcb,
 						 CPU_INT32U				period	 			 
 						 ){
 	//create task similar to OSTaskCreate
-	p_recListKey->period=period;
-	p_recListKey->tcbPtr=p_tcb;
+	p_recListKey->period		= period;
+	p_recListKey->tcbPtr		= p_tcb;
 	//should be changed later when schedule together functionality is implemented
-	p_recListKey->TickCtrMatch = 0;
+	p_recListKey->TickCtrMatch	= 0;
 
 	p_edfRdyListKey->tcbPtr=p_tcb;
 
-	p_recListNode->info=p_recListKey;
-	p_recListNode->key = p_recListNode->info->TickCtrMatch;
-	p_recListNode->tree = RECURSIONTREE;
+	p_recListNode->info				= p_recListKey;
+	p_recListNode->key 				= p_recListNode->info->TickCtrMatch;
+	p_recListNode->overflowState 	= OSTickCtrOverflowState;
+	p_recListNode->tree 			= RECURSIONTREE;
 
 	p_edfRdyListNode->info = p_edfRdyListKey;
 	p_edfRdyListNode->tree = EDFTREE;
 
-	OS_TCB_TO_NODE *p_tcbToNode = (OS_TCB_TO_NODE *) p_ext;
-	p_tcbToNode->recNode = p_recListNode;
-	p_tcbToNode->edfNode = p_edfRdyListNode;
+	OS_TCB_TO_NODE *p_tcbToNode 	= (OS_TCB_TO_NODE *) p_ext;
+	p_tcbToNode->recNode 			= p_recListNode;
+	p_tcbToNode->edfNode 			= p_edfRdyListNode;
 
 	OSRecList = insert(OSRecList, p_recListNode);
 
@@ -163,7 +164,9 @@ void OSRecTaskListUpdate (void){
 	Node* p_min = findMin(OSRecList);
 
 	//use >= for safety, if intr missed
-	while(p_min!=0 && OSTickCtr >= OSSyncReleaseTime + p_min->info->TickCtrMatch){	/* Process each TCB that expires               */
+while(p_min!=0 &&															/* Process each TCB that expires               */
+		OSTickCtrOverflowState == p_min->overflowState &&
+		OSTickCtr >= OSSyncReleaseTime + p_min->info->TickCtrMatch){
 
 		//Step 1 Make task ready to run
 		
@@ -246,8 +249,12 @@ void OSRecTaskListUpdate (void){
 				
 				//substitute above to below in order to use edf scheduler
 				OS_TCB_TO_NODE *tcbToNode =  (OS_TCB_TO_NODE *) (p_min->info->tcbPtr->ExtPtr);
+				CPU_INT32U oldKey = tcbToNode->edfNode->key;
 				tcbToNode->edfNode->key = OSTickCtr + p_min->info->period;	/* set Deadline */
-				tcbToNode->edfNode->info->TickCtrMatch = OSTickCtr + p_min->info->period;
+				tcbToNode->edfNode->info->TickCtrMatch = tcbToNode->edfNode->key;
+				if(tcbToNode->edfNode->key < OSTickCtr) 					/* Overflow?? */
+					tcbToNode->edfNode->overflowState = !OSTickCtrOverflowState;
+				else tcbToNode->edfNode->overflowState = OSTickCtrOverflowState;
 				OS_EdfRdyListInsert(tcbToNode->edfNode);
 
 			#if OS_CFG_DBG_EN > 0u
@@ -267,8 +274,11 @@ void OSRecTaskListUpdate (void){
 		//Step 2 Manage the RecList
 		//delete old entry and add next entry in RecList
 		OSRecList = deleteNode(p_min);
+		oldKey = p_min->info->TickCtrMatch;
 		p_min->info->TickCtrMatch += p_min->info->period;
 		p_min->key = p_min->info->TickCtrMatch;
+		if(p_min->key < oldKey)
+			p_min->overflowState = !p_min->overflowState;
 		OSRecList = insert(OSRecList, p_min);
 
 		p_min = findMin(OSRecList);

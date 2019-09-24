@@ -416,7 +416,10 @@ void  OS_TickListUpdate (void)
 
     OS_CRITICAL_ENTER();
     ts_start = OS_TS_GET();
+    OS_TICK OldOSTickCtr = OSTickCtr;
     OSTickCtr++;                                                       /* Keep track of the number of ticks           */
+    if(OSTickCtr < OldOSTickCtr)                                       /* Did the OSTickCtr overflow?				*/
+        OSTickCtrOverflowState = !OSTickCtrOverflowState;			   /* Toggle the overflow state					*/
     spoke    = (OS_TICK_SPOKE_IX)(OSTickCtr % OSCfg_TickWheelSize);
     p_spoke  = &OSCfg_TickWheel[spoke];
     p_tcb    = p_spoke->FirstPtr;

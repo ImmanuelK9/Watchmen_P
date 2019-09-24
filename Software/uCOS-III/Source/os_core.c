@@ -116,9 +116,10 @@ void  OSInit (OS_ERR  *p_err)
 
     OS_RdyListInit();                                       /* Initialize the Ready List                              */
 
-    OSRecList = 0;                                          /* Initialize the additional global variables             */
-    OSEdfRdyList = 0;                                       /* used for EDF and RecList                               */
-    OSSyncReleaseFlag = 0;
+    OSRecList               = 0;                             /* Initialize the additional global variables             */
+    OSEdfRdyList            = 0;                             /* used for EDF and RecList                               */
+    OSSyncReleaseFlag       = 0;
+    OSTickCtrOverflowState  = 0;
 
     OS_TaskInit(p_err);                                     /* Initialize the task manager                            */
     if (*p_err != OS_ERR_NONE) {
