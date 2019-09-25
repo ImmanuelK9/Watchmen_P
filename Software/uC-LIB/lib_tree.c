@@ -45,7 +45,7 @@ Node*       insert              (Node *p_root, Node *p_n){
     }
     switch(p_n->tree){
         case    RBTREE:		return rbInsert(p_root,p_n);
-        case    BNRHEAP:	return bhInsert(p_root, p_n); 
+    //    case    BNRHEAP:	return bhInsert(p_root, p_n); 
 		default:			fprintf(stdout, "%s", "Tree error - unitialized tree type\n");
                             return 0;
     }
@@ -64,7 +64,7 @@ Node*       deleteNode          (Node *p_n){
     }
     switch(p_n->tree){
         case    RBTREE:		return rbDeleteNode(p_n);
-        case    BNRHEAP:	return bhDeleteNode(p_n); 
+    //    case    BNRHEAP:	return bhDeleteNode(p_n); 
 		default:			fprintf(stdout, "%s", "Tree error - unitialized tree type\n");
                             return 0;
     }
@@ -80,7 +80,7 @@ Node*	    findMin			    (Node* p_n){
 	if(0 == p_n) return 0;      //this could happen if findMin is called on an empty tree
     switch(p_n->tree){
         case    RBTREE:		return rbFindMin(p_n);
-        case    BNRHEAP:	return bhFindMin(p_n); 
+    //    case    BNRHEAP:	return bhFindMin(p_n); 
 		default:			fprintf(stdout, "%s", "Tree error - unitialized tree type\n");
                             return 0;
     }

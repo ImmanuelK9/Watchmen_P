@@ -713,7 +713,7 @@ struct os_tcb_to_node {
 
 struct os_node_info {
 	CPU_INT32U			TickCtrMatch;						/* Absolute time when task is going to be ready         */
-	OS_TCB				*tcbPtr;							/* pointer to TCB assosiacted with this node			*/
+	OS_TCB				*tcbPtr;							/* pointer to TCB associated with this node			*/
 	CPU_INT32U			period;								/* period of this periodic task							*/
 };
 
@@ -730,7 +730,8 @@ struct node {
     struct	node	*right;
     enum	color	color;
     enum	tree	tree;
-CPU_INT32U			key;
+	CPU_INT32U		nodes_number;
+	CPU_INT32U		key;
     OS_NODE_INFO 	*info;
 };
 
