@@ -16,6 +16,7 @@
 /********************************************INCLUDE FILES***********************************************/
 #include "lib_rbTree.h"
 #include "lib_tree.h"
+#include "lib_utils.h"
 
 /********************************************LOCAL DEFINES***********************************************/
 
@@ -40,7 +41,6 @@ void	helpDelete123	(Node* p_n);
 void	helpDelete4		(Node* p_n);
 void	helpDelete56	(Node* p_n);
 Node*	getRoot			(Node* p_n);
-void	changeNodes		(Node* p_a, Node* p_b);
 
 /*************************************LOCAL CONFIGURATION ERRORS*****************************************/
 
@@ -81,8 +81,8 @@ Node* rbDeleteNode (Node *p_n){
 		
 		//p_n->key = p_suc->key;
 		//return deleteNode(p_suc);
-        //normally one could just change the keys but to preserve identity, we completely change nodes
-		changeNodes(p_n, p_suc);
+        //normally one could just change the keys but to preserve identity, we completely swap nodes
+		swapNodes(p_n, p_suc);
 		return rbDeleteNode(p_n);
 	} else{
 		// case (b2)

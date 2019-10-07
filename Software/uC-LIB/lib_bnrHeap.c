@@ -6,15 +6,14 @@
 *
 * Filename		: lib_bnrHeap.c
 * Version		: ?
-* Programmer(s)	: Watchmen_T
-*
-* Note(s) : (1) Maybe use CPU_DATA    CPU_CntLeadZeros (CPU_DATA    val); ?
+* Programmer(s)	: Watchmen_P
 *********************************************************************************************************/
 
 
 /********************************************INCLUDE FILES***********************************************/
 #include "lib_bnrHeap.h"
 #include "lib_tree.h"
+#include "lib_utils.h"
 
 /********************************************LOCAL DEFINES***********************************************/
 
@@ -97,17 +96,20 @@ Node* bhInsert(Node* p_root, Node* p_n) {
 
 	//edge case - heap is empty
 
-	if (p_root == NULL) {
-		p_n->parent = NULL;
+	if (p_root == 0) {
+		p_n->parent = 0;
 		p_root = p_n;
+		p_root->nodes_number = 1;
 		return p_root;
 	}
+
+	CPU_INT32U nodes_number = p_root->nodes_number;
 
 	Node* insertionParentNode = getInsertionLocation(p_root);
 	Node* insertionNode;
 
-	//check whiich child is the insertion location and insert it
-	if ((insertionParentNode->left) == NULL) {
+	//check which child is the insertion location and insert it
+	if ((insertionParentNode->left) == 0) {
 		insertionParentNode->left = p_n;
 	}
 	else {
@@ -116,9 +118,9 @@ Node* bhInsert(Node* p_root, Node* p_n) {
 
 	p_n->parent = insertionParentNode;
 
-	p_root = bubbleUp(p_root, p_n);
+	bubbleUp(p_n);
 
-	p_root->nodes_number = p_root->nodes_number + 1;
+	p_root->nodes_number = nodes_number + 1;
 
 	return p_root;
 }
@@ -131,18 +133,31 @@ Node* bhInsert(Node* p_root, Node* p_n) {
  *********************************************************************************************************/
 Node* bhDeleteNode(Node* p_n) {
 
+	CPU_INT32U nodes_number = p_root->nodes_number;
+	Node* p_root = getRoot(p_n);
+
+	//edge case - deleting the root of a heap that has no other elements
+
+	if ((p_n == p_root) && (nodes_number == 1)) {
+		return 0;
+	}
+
 	//find last node that will replace the deleted one
-	Node* lastNode = getLast()
+	Node* lastNode = getLast();
 
 	//replace node to be deletd with lastNode
+	swapNodes(p_n, lastNode);
 
-
+	//delete p_n and its parent's reference to it
+	Node* parent = p_n->parent;
+	if (parent->left == p_n)	parent->left = 0;
+	else						parent->right = 0;
+	p_n = 0;
 
 	//bubble down lastNode
+	bubbleDown(lastNode);
 
-
-
-	p_root->nodes_number = p_root->nodes_number - 1;
+	p_root->nodes_number = nodes_number - 1;
 
 	return p_root;
 }
@@ -156,7 +171,7 @@ Node* bhFindMin(Node* p_root) {
 
 	//edge case - heap is empty
 
-	if (p_root == NULL) {
+	if (p_root == 0) {
 		return 0;
 	}
 
@@ -164,53 +179,6 @@ Node* bhFindMin(Node* p_root) {
 }
 
 /*********************************************LOCAL FUNCTIONS********************************************/
-
-/******************************************getLast()*************************************************
- * Description : finds the last element in the heap (in the array representation) -
-				 - the rightmost node on the last level of the heap
- * Argument(s) : h      the heap
- * Return(s)   : The last element in the heap
- * Note(s)     : In order to obtain this node, we use a trick that works on complete binary trees:
-
-	Based on the binary represenatation of the number of nodes in the tree, we can decide 
-	which way to go through the tree so that we find the desired node in O(log n) time
-
-	Method: 
-	We take into account all digits except the leftmost 1, such as by starting from left to right:
-				if the digit is 0, we move from the current down to the left node in the tree
-				if the digit is 1, we move to the right node
-
-	Example: number of nodes = 5 <=> 1 0 1
-			- first digit taken into account is 0 => from root (0) we move left to 1
-			- second (and last digit) is 1 => from current node (1) we move right to 4
-			=> we arrived at the final node
-
-		                0
-                       / \        
-                      1   2           
-                     / \                
-                    3   4
- *********************************************************************************************************/
-/*
-heap_node* getLast(Heap* h) {
-	
-	CPU_INT32U nodes_number = h -> nodes_number;
-
-	// stores the binary representation of the number of nodes in heap, 
-	// such that nodes_number_binary[0] stores the least significant digit of nodes_number
-	CPU_INT32U[32] nodes_number_binary;			
-	
-
-	for (int i = 0; i < 32; i++) {
-		nodes_number_binary[i] = nodes_number % 2;
-		nodes_number = nodes_number >> 1;
-	}
-
-	//move through tree
-
-	return p_n;
-}
-*/
 
 //continue hacky way
 
@@ -338,17 +306,15 @@ heap_node* getLast(Heap* h) {
 
  /******************************************bubbleUp()****************************************************
  * Description : helper function for bhInsert() that moves up the newly inserted node in its right place
- * Argument(s) : p_root  pointer to root of the tree
- *               p_n     pointer to node that should be bubbled up
- * Return(s)    : A pointer to the (new) root of the tree
+ * Argument(s) : p_n     pointer to node that is bubbled up
  *********************************************************************************************************/
- Node* bubbleUp(Node* p_root, Node* p_n) {
+ void bubbleUp(Node* p_n) {
 
 	 Node* currentParent = p_n->parent;
 	 Node* currentParentParent;
 	 Node* tempNode;
 
-	 while ((currentParent != NULL) && (!cmpKey(p_n, currentParent))) {
+	 while ((currentParent != 0) && (!cmpKey(p_n, currentParent))) {
 
 		 currentParentParent = currentParent->parent;
 
@@ -356,7 +322,7 @@ heap_node* getLast(Heap* h) {
 		 p_n->parent = currentParentParent;
 		 currentParent->parent = p_n;
 
-		 if (currentParentParent != NULL) {
+		 if (currentParentParent != 0) {
 			 //if there exists the need to change the currentParent parent's child pointer
 
 			 if (cmpKey(currentParent, currentParentParent->left) == 0) {
@@ -397,18 +363,18 @@ heap_node* getLast(Heap* h) {
 		 //keep moving up
 		 currentParent = p_n->parent;
 	 }
-
-	 return p_root;
  }
 
  /******************************************bubbleDown()****************************************************
  * Description : helper function for bhDelete() that moves down the placeholder node in its right place
- * Argument(s) : p_root  pointer to root of the tree
- *               p_n     pointer to node that has to be bubbled down
- * Return(s)    : A pointer to the (new) root of the tree
+ * Argument(s) : p_n     pointer to node that has to be bubbled down
  *********************************************************************************************************/
- Node* bubbleDown(Node* p_root, Node* p_n) {
+ void bubbleDown(Node* p_n) {
 
+	 Node* maxChild = findMaxChild(p_n);
 
-
+	 while ((maxChild != 0) && (cmpKey(maxChild, p_n))) {
+		 swapNodes(maxChild, p_n);
+		 maxChild = findMaxChild(p_n);
+	 }
  }

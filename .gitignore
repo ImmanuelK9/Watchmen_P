@@ -168,3 +168,5 @@ Backup*
 
 Software/EvalBoards/TI/LM3S9B92-EVALBOT/IAR/uCOS-III-CE4053_PG/Flash/Obj/uCOS-III-CE4053_PG.pbw
 **/Obj/*.pbw
+/.vs
+/.idea
