@@ -36,6 +36,7 @@
 #include "inc/hw_types.h"
 #include <os.h>
 #include <test_rbTree.h>
+#include <test_bnrHeap.h>
 
 /*
 *********************************************************************************************************
@@ -187,9 +188,10 @@ int  main (void)
     BSP_IntDisAll();                                            /* Disable all interrupts.                              */
     OSInit(&err);                                               /* Init uC/OS-III.                                      */
     //fprintf(stdout, "%#10X\n", a);
-    //testRBTreeScenario0(&a, &b);
-	//testRBTreeScenario2(x, K);
-    OSTaskCreate((OS_TCB     *)&AppTaskStartTCB,           /* Create the start task                                */
+    //testBHScenario0(&a, &b);
+    testBHScenario2(x, 6);
+    /*
+    OSTaskCreate((OS_TCB     *)&AppTaskStartTCB,            //Create the start task                               
                  (CPU_CHAR   *)"App Task Start",
                  (OS_TASK_PTR ) AppTaskStart,
                  (void       *) 0,
@@ -203,7 +205,7 @@ int  main (void)
                  (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
                  (OS_ERR     *)&err);
 
-    OSStart(&err);                                              /* Start multitasking (i.e. give control to uC/OS-III). */
+    OSStart(&err);                                              //Start multitasking (i.e. give control to uC/OS-III). */
 }
 
 /*

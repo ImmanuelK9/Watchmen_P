@@ -1683,6 +1683,12 @@
     <group>
         <name>tests</name>
         <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\tests\test_bnrHeap.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\tests\test_bnrHeap.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\tests\test_rbTree.c</name>
         </file>
         <file>
@@ -1744,6 +1750,9 @@
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_tree.h</name>
             </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_utils.h</name>
+            </file>
         </group>
         <group>
             <name>Source</name>
@@ -1767,6 +1776,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_tree.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\uC-LIB\lib_utils.c</name>
             </file>
         </group>
     </group>
