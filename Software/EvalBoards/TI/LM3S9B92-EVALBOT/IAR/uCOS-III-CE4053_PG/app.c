@@ -189,8 +189,8 @@ int  main (void)
     OSInit(&err);                                               /* Init uC/OS-III.                                      */
     //fprintf(stdout, "%#10X\n", a);
     //testBHScenario0(&a, &b);
-    testBHScenario2(x, 6);
-    /*
+    //testBHScenario2(x, 5);
+	
     OSTaskCreate((OS_TCB     *)&AppTaskStartTCB,            //Create the start task                               
                  (CPU_CHAR   *)"App Task Start",
                  (OS_TASK_PTR ) AppTaskStart,
@@ -205,7 +205,7 @@ int  main (void)
                  (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
                  (OS_ERR     *)&err);
 
-    OSStart(&err);                                              //Start multitasking (i.e. give control to uC/OS-III). */
+    OSStart(&err);                                              //Start multitasking (i.e. give control to uC/OS-III). 
 }
 
 /*
@@ -242,19 +242,19 @@ static  void  AppTaskStart (void  *p_arg)
     
     /* Initialise the 2 Main Tasks to  Deleted State */
 
-    //OSTaskCreate((OS_TCB     *)&AppTaskOneTCB, (CPU_CHAR   *)"App Task One", (OS_TASK_PTR ) AppTaskOne, (void       *) 0, (OS_PRIO     ) APP_TASK_ONE_PRIO, (CPU_STK    *)&AppTaskOneStk[0], (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *)(CPU_INT32U) 1, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
-    //OSTaskCreate((OS_TCB     *)&AppTaskTwoTCB, (CPU_CHAR   *)"App Task Two", (OS_TASK_PTR ) AppTaskTwo, (void       *) 0, (OS_PRIO     ) APP_TASK_TWO_PRIO, (CPU_STK    *)&AppTaskTwoStk[0], (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *) (CPU_INT32U) 2, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
+    OSTaskCreate((OS_TCB     *)&AppTaskOneTCB, (CPU_CHAR   *)"App Task One", (OS_TASK_PTR ) AppTaskOne, (void       *) 0, (OS_PRIO     ) APP_TASK_ONE_PRIO, (CPU_STK    *)&AppTaskOneStk[0], (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_ONE_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *)(CPU_INT32U) 1, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
+    OSTaskCreate((OS_TCB     *)&AppTaskTwoTCB, (CPU_CHAR   *)"App Task Two", (OS_TASK_PTR ) AppTaskTwo, (void       *) 0, (OS_PRIO     ) APP_TASK_TWO_PRIO, (CPU_STK    *)&AppTaskTwoStk[0], (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE / 10u, (CPU_STK_SIZE) APP_TASK_TWO_STK_SIZE, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *) (CPU_INT32U) 2, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
 	
 	//this task should only be enabled, if APPLED is also used.
-	OSTaskCreate((OS_TCB     *)&DeleteLEDTaskTCB, (CPU_CHAR   *)"Delete LED", (OS_TASK_PTR ) DeleteLEDTask, (void       *) 0, (OS_PRIO     ) OSCfg_EdfSchedPrio+1, (CPU_STK    *)&DeleteLEDTaskStk[0], (CPU_STK_SIZE) APP_DELETE_LED_TASK / 10u, (CPU_STK_SIZE) APP_DELETE_LED_TASK, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *) (CPU_INT32U) 0, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
+	//OSTaskCreate((OS_TCB     *)&DeleteLEDTaskTCB, (CPU_CHAR   *)"Delete LED", (OS_TASK_PTR ) DeleteLEDTask, (void       *) 0, (OS_PRIO     ) OSCfg_EdfSchedPrio+1, (CPU_STK    *)&DeleteLEDTaskStk[0], (CPU_STK_SIZE) APP_DELETE_LED_TASK / 10u, (CPU_STK_SIZE) APP_DELETE_LED_TASK, (OS_MSG_QTY  ) 0u, (OS_TICK     ) 0u, (void       *) (CPU_INT32U) 0, (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (OS_ERR     *)&err);
 
 	//prio is (should be) ignored by the OS from now on, because periodic => OSCfg_EdfSchedPrio
 	//macroOSRecTaskCreate(AppTaskThree, AppTaskThree, 0, 4, APP_TASK_THREE_STK_SIZE, 10u, 5000);
 	macroOSRecTaskCreate(APPLED, LEDBlink, 0, 4, APP_LED_BLINK_STK_SIZE, 10u, 5000);
-	//macroOSRecTaskCreate(APPMoveF, moveForward, 0, 4, APP_MOVE_F_STK_SIZE, 10u, 10000);
-	//macroOSRecTaskCreate(APPMoveB, moveBackward, 0, 4, APP_MOVE_B_STK_SIZE, 10u, 17000);
-	//macroOSRecTaskCreate(APPMoveL, leftTurn, 0, 4, APP_MOVE_L_STK_SIZE, 10u, 25000);
-	//macroOSRecTaskCreate(APPMoveR, rightTurn, 0, 4, APP_MOVE_R_STK_SIZE, 10u, 47000);
+	macroOSRecTaskCreate(APPMoveF, moveForward, 0, 4, APP_MOVE_F_STK_SIZE, 10u, 10000);
+	macroOSRecTaskCreate(APPMoveB, moveBackward, 0, 4, APP_MOVE_B_STK_SIZE, 10u, 17000);
+	macroOSRecTaskCreate(APPMoveL, leftTurn, 0, 4, APP_MOVE_L_STK_SIZE, 10u, 25000);
+	macroOSRecTaskCreate(APPMoveR, rightTurn, 0, 4, APP_MOVE_R_STK_SIZE, 10u, 47000);
 
 	OSSyncRelease();
     

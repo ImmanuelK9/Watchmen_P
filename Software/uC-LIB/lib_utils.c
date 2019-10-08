@@ -112,19 +112,19 @@ void swapNodes(Node* p_a, Node* p_b) {
 	p_b->color = help.color;
 }
 
-/********************************************findMaxChild()**********************************************
-* Description	: Finding the child with the largest key based on cmpKey() in lib_tree.c
+/********************************************findMinChild()**********************************************
+* Description	: Finding the child with the smallest key based on cmpKey() in lib_tree.c
 * Argument(s)	: p_n		the node whose children are compared
 * Return(s)		: The child with the max key value
 * Note(s)		: in case at least one of the children are 0, returns 0
 *********************************************************************************************************/
-Node* findMaxChild(Node* p_n) {
+Node* findMinChild(Node* p_n) {
 
 	Node* leftChild = p_n->left;
 	Node* rightChild = p_n->right;
 
 	if (leftChild == 0 || rightChild == 0) return 0;
-	if (cmpKey(leftChild, rightChild))		return leftChild;
-	else									return rightChild;
+	if (cmpKey(leftChild, rightChild))		return rightChild;
+	else									return leftChild;
 
 }

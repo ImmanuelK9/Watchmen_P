@@ -398,10 +398,10 @@ void bubbleUp(Node* p_n) {
  *********************************************************************************************************/
  void bubbleDown(Node* p_n) {
 
-	 Node* maxChild = findMaxChild(p_n);
+	 Node* minChild = findMinChild(p_n);
 
-	 while ((maxChild != 0) && (cmpKey(maxChild, p_n))) {
-		 swapNodes(maxChild, p_n);
-		 maxChild = findMaxChild(p_n);
+	 while ((minChild != 0) && (cmpKey(minChild, p_n))) {
+		 swapNodes(minChild, p_n);
+		 minChild = findMinChild(p_n);
 	 }
  }

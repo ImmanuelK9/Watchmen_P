@@ -30,7 +30,7 @@
 /******************************************FUNCTION PROTOTYPES*******************************************/
 Node* getRoot(Node* p_n);
 void swapNodes(Node* p_a, Node* p_b);
-Node* findMaxChild(Node* p_n);
+Node* findMinChild(Node* p_n);
 
 /***********************************************MODULE END***********************************************/
 #endif
