@@ -1772,8 +1772,7 @@ void          OSRecTaskCreate			(OS_TCB                *p_tcb,
 
 void			OSSyncRelease			(void);
 
-void          OSRecTaskFinish           (OS_TCB                *p_tcb,
-                                         OS_ERR                *p_err);
+void          OSRecTaskFinish           (void);
 
 void		OSRecTaskListUpdate			(void);
 

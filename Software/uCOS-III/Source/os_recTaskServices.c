@@ -50,8 +50,6 @@ void		OSTaskCreateMod				(OS_TCB                *p_tcb,
                                          OS_OPT                 opt,
                                          OS_ERR                *p_err);
 
-void		OSRecTaskFinishHelp(void);
-
 
 /*************************************LOCAL CONFIGURATION ERRORS*****************************************/
 
@@ -146,13 +144,10 @@ void OSSyncRelease(void){
 
 /********************************DEPRECATED**OSRecTaskFinish()*********************************************									
  * Description 	:	A recursive task should call this function when it finishes (at least indirectly)
- * Argument(s)	: 	p_tcb      is the TCB of the tack to delete
- *					p_err      is a pointer to an error code returned by this function:
- *                             OS_ERR_NONE                  if the call is successful
  * Note(s)		:	NOT IN USE
  *********************************************************************************************************/
-void OSRecTaskFinish (OS_TCB *p_tcb1, OS_ERR *p_err){
-	
+void OSRecTaskFinish (void){
+	fprintf(stdout, "%s", "RecTask error - periodic task returned (accidently) without calling delete\n");
 }
 
 
@@ -176,26 +171,36 @@ void OSRecTaskListUpdate (void){
 		p_min->info->tcbPtr->TaskState = OS_TASK_STATE_RDY;
 		
 		//orientate at OSTaskCreate, many (unused) parts got left out for better overview
-		//this should be optimized later
+		//this could be optimized by doing it after the task finished instead of before the task is released
 		//=====================
 			CPU_STK_SIZE   i;
+			#if OS_CFG_TASK_REG_TBL_SIZE > 0u
+				OS_OBJ_QTY     reg_nbr;
+			#endif
 			CPU_STK       *p_sp;
 			CPU_STK       *p_stk_limit;
 			CPU_SR_ALLOC();
 
+			#ifdef OS_SAFETY_CRITICAL_IEC61508
+				if (OSSafetyCriticalStartFlag == DEF_TRUE) {
+				*p_err = OS_ERR_ILLEGAL_CREATE_RUN_TIME;
+					return;
+				}
+			#endif
+
+			//make the following variable for the statements copied from OSTaskCreate
 			OS_TCB        *p_tcb=p_min->info->tcbPtr;
-			CPU_CHAR      *p_name=p_tcb->NamePtr;
 			OS_TASK_PTR    p_task=p_tcb->TaskEntryAddr;
 			void          *p_arg=p_tcb->TaskEntryArg;
-			OS_PRIO        prio=p_tcb->Prio;
 			CPU_STK       *p_stk_base=p_tcb->StkBasePtr;
 			CPU_STK_SIZE   stk_limit=(CPU_STK_SIZE) 128u / 10u;
 			CPU_STK_SIZE   stk_size=p_tcb->StkSize;
-			OS_MSG_QTY     q_size=0;
-			OS_TICK        time_quanta=p_tcb->TimeQuanta;
-			void          *p_ext=p_tcb->ExtPtr;
+			OS_MSG_QTY     q_size=p_tcb->MsgQ.NbrEntriesSize;
 			OS_OPT         opt=p_tcb->Opt;
-			OS_TaskInitTCB(p_tcb);                                  /* Initialize the TCB to default values                   */
+
+			//validate arguments/prio not needed because task already passed the tests during creation
+			//do not init TCB to default values because old values are still present and needed
+
 																	/* --------------- CLEAR THE TASK'S STACK --------------- */
 			if ((opt & OS_OPT_TASK_STK_CHK) != (OS_OPT)0) {         /* See if stack checking has been enabled                 */
 				if ((opt & OS_OPT_TASK_STK_CLR) != (OS_OPT)0) {     /* See if stack needs to be cleared                       */
@@ -206,53 +211,41 @@ void OSRecTaskListUpdate (void){
 					}
 				}
 			}
-																		/* ------- INITIALIZE THE STACK FRAME OF THE TASK ------- */
-			#if (CPU_CFG_STK_GROWTH == CPU_STK_GROWTH_HI_TO_LO)
-				p_stk_limit = p_stk_base + stk_limit;
-			#else
-				p_stk_limit = p_stk_base + (stk_size - 1u) - stk_limit;
-			#endif
-			//different
+			
+			//stack frame is already initialized as this task already ran
+
+			//use different stack initialization
 			p_sp = OSRecTaskStkInit(p_task,	p_arg, p_stk_base, p_stk_limit, stk_size, opt);
 
-																	/* -------------- INITIALIZE THE TCB FIELDS ------------- */
-			p_tcb->TaskEntryAddr = p_task;                          /* Save task entry point address                          */
+			//most of the TCB fields are still valid 
+			//from the last execution								/* -------------- INITIALIZE THE TCB FIELDS ------------- */
 			p_tcb->TaskEntryArg  = p_arg;                           /* Save task entry argument                               */
-
-			p_tcb->NamePtr       = p_name;                          /* Save task name                                         */
-
-			p_tcb->Prio          = OSCfg_EdfSchedPrio;              /* Save the task's priority  ----!!!different                      */
-
 			p_tcb->StkPtr        = p_sp;                            /* Save the new top-of-stack pointer                      */
-			p_tcb->StkLimitPtr   = p_stk_limit;                     /* Save the stack limit pointer                           */
 
-			p_tcb->TimeQuanta    = time_quanta;                     /* Save the #ticks for time slice (0 means not sliced)    */
-		
-			p_tcb->ExtPtr        = p_ext;                           /* Save pointer to TCB extension                          */
-			p_tcb->StkBasePtr    = p_stk_base;                      /* Save pointer to the base address of the stack          */
-			p_tcb->StkSize       = stk_size;                        /* Save the stack size (in number of CPU_STK elements)    */
-			p_tcb->Opt           = opt;                             /* Save task options                                      */
-
+			#if OS_CFG_TASK_REG_TBL_SIZE > 0u
+				for (reg_nbr = 0u; reg_nbr < OS_CFG_TASK_REG_TBL_SIZE; reg_nbr++) {
+					p_tcb->RegTbl[reg_nbr] = (OS_REG)0;
+				}
+			#endif
 
 			#if OS_CFG_TASK_Q_EN > 0u
 				OS_MsgQInit(&p_tcb->MsgQ,                               /* Initialize the task's message queue                    */
 							q_size);
 			#endif
 
-				OSTaskCreateHook(p_tcb);                                /* Call user defined hook                                 */
-																		/* --------------- ADD TASK TO READY LIST --------------- */
-				OS_CRITICAL_ENTER();
-				//OS_PrioInsert(p_tcb->Prio);
-				//OS_RdyListInsertTail(p_tcb);
-				
-				//substitute above to below in order to use edf scheduler
-				OS_TCB_TO_NODE *tcbToNode =  (OS_TCB_TO_NODE *) (p_min->info->tcbPtr->ExtPtr);
-				tcbToNode->edfNode->key = OSTickCtr + p_min->info->period;	/* set Deadline */
-				tcbToNode->edfNode->info->TickCtrMatch = tcbToNode->edfNode->key;
-				if(tcbToNode->edfNode->key < OSTickCtr) 					/* Overflow?? */
-					tcbToNode->edfNode->overflowState = !OSTickCtrOverflowState;
-				else tcbToNode->edfNode->overflowState = OSTickCtrOverflowState;
-				OS_EdfRdyListInsert(tcbToNode->edfNode);
+			//TODO not sure if this function has to be called here
+			OSTaskCreateHook(p_tcb);                                /* Call user defined hook                                 */
+																	/* --------------- ADD TASK TO READY LIST --------------- */
+			OS_CRITICAL_ENTER();
+			
+			//substituted insertion to ready Q in order to use edf scheduler
+			OS_TCB_TO_NODE *tcbToNode =  (OS_TCB_TO_NODE *) (p_min->info->tcbPtr->ExtPtr);
+			tcbToNode->edfNode->key = OSTickCtr + p_min->info->period;	/* set Deadline */
+			tcbToNode->edfNode->info->TickCtrMatch = tcbToNode->edfNode->key;
+			if(tcbToNode->edfNode->key < OSTickCtr) 					/* Overflow?? */
+				tcbToNode->edfNode->overflowState = !OSTickCtrOverflowState;
+			else tcbToNode->edfNode->overflowState = OSTickCtrOverflowState;
+			OS_EdfRdyListInsert(tcbToNode->edfNode);
 
 			#if OS_CFG_DBG_EN > 0u
 				OS_TaskDbgListAdd(p_tcb);
@@ -260,13 +253,14 @@ void OSRecTaskListUpdate (void){
 
 			OSTaskQty++;                                            /* Increment the #tasks counter                           */
 
+			//TODO not sure if the following statement should be left here
 			if (OSRunning != OS_STATE_OS_RUNNING) {                 /* Return if multitasking has not started                 */
 				OS_CRITICAL_EXIT();
 				return;
 			}
 
 			OS_CRITICAL_EXIT_NO_SCHED();
-		//=============
+		//=====================
 
 		//Step 2 Manage the RecList
 		//delete old entry and add next entry in RecList
@@ -311,6 +305,7 @@ void OSRecTaskDelete(OS_TCB *p_tcb){
  *
  * Returns    : Always returns the location of the new top-of-stack' once the processor registers have
  *              been placed on the stack in the proper order.
+ * Note		  : copy of OSTaskStk Init except that R14 is initialized differently
  **********************************************************************************************************/
 CPU_STK  *OSRecTaskStkInit (OS_TASK_PTR    p_task,
 							void          *p_arg,
@@ -327,7 +322,7 @@ CPU_STK  *OSRecTaskStkInit (OS_TASK_PTR    p_task,
                                                             /* Registers stacked as if auto-saved on exception        */
     *--p_stk = (CPU_STK)0x01000000u;                        /* xPSR                                                   */
     *--p_stk = (CPU_STK)p_task;                             /* Entry Point                                            */
-    *--p_stk = (CPU_STK)OSRecTaskFinishHelp;                /* R14 (LR) --- different!!                                             */
+    *--p_stk = (CPU_STK)OSRecTaskFinish;                /* R14 (LR) --- different!!                                             */
     *--p_stk = (CPU_STK)0x12121212u;                        /* R12                                                    */
     *--p_stk = (CPU_STK)0x03030303u;                        /* R3                                                     */
     *--p_stk = (CPU_STK)0x02020202u;                        /* R2                                                     */
@@ -348,10 +343,11 @@ CPU_STK  *OSRecTaskStkInit (OS_TASK_PTR    p_task,
 
 /**********************************************OSTaskCreateMod()*******************************************
  * Description 	:	Creates a periodic task
- * Note(s)		:	largely copied from OSTaskCreate but this
+ * Note(s)		:	copy of OSTaskCreate except of
  * 						(1) does not put the task into ready Q -> does not get scheduled directly
  * 						(2) uses another TaskStkInit function / this may be omitted
  * 						(3) ALWAYS uses OSCfg_EdfSchedPrio as prio
+ * 						(4) does not increment OSTaskQty
  *********************************************************************************************************/
 void  OSTaskCreateMod (OS_TCB        *p_tcb,
                     CPU_CHAR      *p_name,
@@ -503,18 +499,6 @@ void  OSTaskCreateMod (OS_TCB        *p_tcb,
 	#endif
 
 		OSTaskCreateHook(p_tcb);                                /* Call user defined hook                                 */
-	//do not ask task to ready Q for now
-	#if 0
-																/* --------------- ADD TASK TO READY LIST --------------- */
-		OS_CRITICAL_ENTER();
-		OS_PrioInsert(p_tcb->Prio);
-		OS_RdyListInsertTail(p_tcb);
-
-	#if OS_CFG_DBG_EN > 0u
-		OS_TaskDbgListAdd(p_tcb);
-	#endif
-
-		OSTaskQty++;                                            /* Increment the #tasks counter                           */
 
 		if (OSRunning != OS_STATE_OS_RUNNING) {                 /* Return if multitasking has not started                 */
 			OS_CRITICAL_EXIT();
@@ -522,15 +506,6 @@ void  OSTaskCreateMod (OS_TCB        *p_tcb,
 		}
 
 		OS_CRITICAL_EXIT_NO_SCHED();
-	#endif
-		OSSched();
-}
 
-/***************************************************DEPRECATED*********************************************
- * Description 	:	This function was used as a substitute for OS_TaskReturn, this needs to be specified
- * 					during task stack init
- * Note(s)		:	NOT IN USE
- *********************************************************************************************************/
-void OSRecTaskFinishHelp(void){
-	//OSRecTaskFinish ((OS_TCB *)0 , (OS_ERR *)&err);
+		OSSched();
 }
