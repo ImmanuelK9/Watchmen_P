@@ -72,6 +72,7 @@ void swapNodes(Node* p_a, Node* p_b) {
 	help.parent = p_a->parent;
 	help.left = p_a->left;
 	help.right = p_a->right;
+	help.color = p_a->color;
 	help.key = p_a->key;
 
 	CPU_INT08U aIsLeftChild = 0;

@@ -170,3 +170,5 @@ Software/EvalBoards/TI/LM3S9B92-EVALBOT/IAR/uCOS-III-CE4053_PG/Flash/Obj/uCOS-II
 **/Obj/*.pbw
 /.vs
 /.idea
+/test.txt
+/IO.txt

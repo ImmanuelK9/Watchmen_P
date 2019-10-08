@@ -1686,6 +1686,9 @@
             <name>$PROJ_DIR$\..\..\..\..\..\tests\test_bnrHeap.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\tests\test_bnrHeap.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\..\..\..\tests\test_rbTree.c</name>
         </file>
         <file>

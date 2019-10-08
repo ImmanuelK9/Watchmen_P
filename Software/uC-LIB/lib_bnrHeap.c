@@ -14,6 +14,8 @@
 #include "lib_bnrHeap.h"
 #include "lib_tree.h"
 #include "lib_utils.h"
+#include <stdio.h>
+#include "test_bnrHeap.h"
 
 /********************************************LOCAL DEFINES***********************************************/
 
@@ -42,7 +44,10 @@ struct Heap {
 /***************************************LOCAL GLOBAL VARIABLES*******************************************/
 
 /**************************************LOCAL FUNCTION PROTOTYPES*****************************************/
-
+Node* getLast(Node* p_root);
+Node* getInsertionLocation(Node* p_root);
+void bubbleUp(Node* p_n);
+void bubbleDown(Node* p_n);
 
 
 /*************************************LOCAL CONFIGURATION ERRORS*****************************************/
@@ -97,7 +102,7 @@ Node* bhInsert(Node* p_root, Node* p_n) {
 	//edge case - heap is empty
 
 	if (p_root == 0) {
-		p_n->parent = 0;
+		p_n->parent = p_n->left = p_n->right = 0;
 		p_root = p_n;
 		p_root->nodes_number = 1;
 		return p_root;
@@ -106,7 +111,6 @@ Node* bhInsert(Node* p_root, Node* p_n) {
 	CPU_INT32U nodes_number = p_root->nodes_number;
 
 	Node* insertionParentNode = getInsertionLocation(p_root);
-	Node* insertionNode;
 
 	//check which child is the insertion location and insert it
 	if ((insertionParentNode->left) == 0) {
@@ -120,8 +124,10 @@ Node* bhInsert(Node* p_root, Node* p_n) {
 
 	bubbleUp(p_n);
 
-	p_root->nodes_number = nodes_number + 1;
+	p_root = getRoot(p_n);
 
+	p_root->nodes_number = nodes_number + 1;
+        
 	return p_root;
 }
 
@@ -133,8 +139,8 @@ Node* bhInsert(Node* p_root, Node* p_n) {
  *********************************************************************************************************/
 Node* bhDeleteNode(Node* p_n) {
 
-	CPU_INT32U nodes_number = p_root->nodes_number;
 	Node* p_root = getRoot(p_n);
+	CPU_INT32U nodes_number = p_root->nodes_number;
 
 	//edge case - deleting the root of a heap that has no other elements
 
@@ -143,7 +149,7 @@ Node* bhDeleteNode(Node* p_n) {
 	}
 
 	//find last node that will replace the deleted one
-	Node* lastNode = getLast();
+	Node* lastNode = getLast(p_root);
 
 	//replace node to be deletd with lastNode
 	swapNodes(p_n, lastNode);
@@ -156,6 +162,8 @@ Node* bhDeleteNode(Node* p_n) {
 
 	//bubble down lastNode
 	bubbleDown(lastNode);
+
+	p_root = getRoot(lastNode);
 
 	p_root->nodes_number = nodes_number - 1;
 
@@ -215,7 +223,7 @@ Node* bhFindMin(Node* p_root) {
 
 	 // stores the binary representation of the number of nodes in heap,
 	 // such that nodes_number_binary[0] stores the least significant digit of nodes_number
-	 CPU_INT32U[32] nodes_number_binary;
+	 CPU_INT32U nodes_number_binary[32];
 
 	 int position = -1;
 
@@ -264,7 +272,7 @@ Node* bhFindMin(Node* p_root) {
 			- first digit taken into account is 1 => from root (0) we move right to 2
 			- as we have only one digit left, we return 2 as the parent of the next insertion location
 
-						0
+                                            0
 					   / \
 					  1   2
 					 / \
@@ -278,7 +286,7 @@ Node* bhFindMin(Node* p_root) {
 
 	 // stores the binary representation of the number of nodes in heap,
 	 // such that nodes_number_binary[0] stores the least significant digit of nodes_number
-	 CPU_INT32U[32] nodes_number_binary;
+	 CPU_INT32U nodes_number_binary[32];
 
 	 int position = -1;
 
@@ -288,7 +296,7 @@ Node* bhFindMin(Node* p_root) {
 	 };
 
 	 //move through tree by making decision that start at nodes_number_binary[position]
-
+         
 	 while (position > 0) {
 		 if (nodes_number_binary[position]) {
 			 //move right
@@ -306,8 +314,11 @@ Node* bhFindMin(Node* p_root) {
 
  /******************************************bubbleUp()****************************************************
  * Description : helper function for bhInsert() that moves up the newly inserted node in its right place
- * Argument(s) : p_n     pointer to node that is bubbled up
+ * Argument(s) : p_n			pointer to node that is bubbled up
  *********************************************************************************************************/
+
+ //one way
+ /*
  void bubbleUp(Node* p_n) {
 
 	 Node* currentParent = p_n->parent;
@@ -363,11 +374,27 @@ Node* bhFindMin(Node* p_root) {
 		 //keep moving up
 		 currentParent = p_n->parent;
 	 }
+ } 
+ */
+
+ //shorter way
+void bubbleUp(Node* p_n) {
+
+	 Node* currentParent = p_n->parent;
+
+	 while ((currentParent != 0) && (cmpKey(p_n, currentParent) < 0)) {
+
+		 //swap p_n with its parent
+		 swapNodes(currentParent, p_n);
+
+		 //keep moving up
+		 currentParent = p_n->parent;
+	 }
  }
 
  /******************************************bubbleDown()****************************************************
  * Description : helper function for bhDelete() that moves down the placeholder node in its right place
- * Argument(s) : p_n     pointer to node that has to be bubbled down
+ * Argument(s) : p_n			pointer to node that is bubbled down
  *********************************************************************************************************/
  void bubbleDown(Node* p_n) {
 
