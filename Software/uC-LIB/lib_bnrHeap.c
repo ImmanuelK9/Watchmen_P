@@ -14,8 +14,6 @@
 #include "lib_bnrHeap.h"
 #include "lib_tree.h"
 #include "lib_utils.h"
-#include <stdio.h>
-#include "test_bnrHeap.h"
 
 /********************************************LOCAL DEFINES***********************************************/
 
@@ -400,7 +398,7 @@ void bubbleUp(Node* p_n) {
 
 	 Node* minChild = findMinChild(p_n);
 
-	 while ((minChild != 0) && (cmpKey(minChild, p_n))) {
+	 while ((minChild != 0) && (cmpKey(minChild, p_n) < 0)) {
 		 swapNodes(minChild, p_n);
 		 minChild = findMinChild(p_n);
 	 }

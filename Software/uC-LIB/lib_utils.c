@@ -116,15 +116,18 @@ void swapNodes(Node* p_a, Node* p_b) {
 * Description	: Finding the child with the smallest key based on cmpKey() in lib_tree.c
 * Argument(s)	: p_n		the node whose children are compared
 * Return(s)		: The child with the max key value
-* Note(s)		: in case at least one of the children are 0, returns 0
+* Note(s)		: (1) in case both children are 0, returns 0
+				  (2) if one child is 0, return the other
 *********************************************************************************************************/
 Node* findMinChild(Node* p_n) {
 
 	Node* leftChild = p_n->left;
 	Node* rightChild = p_n->right;
 
-	if (leftChild == 0 || rightChild == 0) return 0;
-	if (cmpKey(leftChild, rightChild))		return rightChild;
-	else									return leftChild;
+	if (leftChild == 0 && rightChild == 0) return 0;
+	if (leftChild == 0) return rightChild;
+	if (rightChild == 0) return leftChild;
+	if (cmpKey(leftChild, rightChild) < 0)	return leftChild;
+	else									return rightChild;
 
 }

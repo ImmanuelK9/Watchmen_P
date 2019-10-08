@@ -189,8 +189,8 @@ int  main (void)
     OSInit(&err);                                               /* Init uC/OS-III.                                      */
     //fprintf(stdout, "%#10X\n", a);
     //testBHScenario0(&a, &b);
-    //testBHScenario2(x, 5);
-	
+    testBHScenario2(x, 5);
+	/*
     OSTaskCreate((OS_TCB     *)&AppTaskStartTCB,            //Create the start task                               
                  (CPU_CHAR   *)"App Task Start",
                  (OS_TASK_PTR ) AppTaskStart,
@@ -205,7 +205,7 @@ int  main (void)
                  (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
                  (OS_ERR     *)&err);
 
-    OSStart(&err);                                              //Start multitasking (i.e. give control to uC/OS-III). 
+    OSStart(&err);                             */                 //Start multitasking (i.e. give control to uC/OS-III). 
 }
 
 /*

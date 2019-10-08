@@ -83,6 +83,12 @@ void testBHScenario2(Node* x, CPU_INT32U k) {
 	testBH(currentRoot);
 	print2DBH(currentRoot);
 
+	fprintf(stdout, "\n deleting %d \n", (x + 1)->key);
+
+	currentRoot = deleteNode(x+1);
+	testBH(currentRoot);
+	print2DBH(currentRoot);
+
 	//currentRoot = insert(currentRoot, x + 2);
 }
 
