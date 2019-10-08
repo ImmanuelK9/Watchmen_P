@@ -719,8 +719,8 @@ struct os_node_info {
 
 enum color {RED, BLACK};
 enum tree {RBTREE, BNRHEAP};
-#define     RECURSIONTREE       RBTREE
-#define     EDFTREE             RBTREE
+#define     RECURSIONTREE       BNRHEAP
+#define     EDFTREE             BNRHEAP
 //key is used to compare in the tree
 //the same info is stored somewhere in info
 //be careful when updating ; ALWAYS UPDATE BOTH
