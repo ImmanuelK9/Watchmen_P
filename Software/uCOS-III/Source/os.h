@@ -731,6 +731,7 @@ struct node {
     enum	color	color;
     enum	tree	tree;
 	CPU_INT32U		key;
+	CPU_INT32U		nodes_number;
 	CPU_BOOLEAN		overflowState;
 	CPU_BOOLEAN		inTree;
     OS_NODE_INFO 	*info;
