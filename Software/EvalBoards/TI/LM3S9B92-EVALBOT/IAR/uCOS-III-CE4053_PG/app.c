@@ -187,9 +187,6 @@ int  main (void)
 
     BSP_IntDisAll();                                            /* Disable all interrupts.                              */
     OSInit(&err);                                               /* Init uC/OS-III.                                      */
-    //fprintf(stdout, "%#10X\n", a);
-    //testBHScenario0(&a, &b);
-    //testBHScenario2(x, 5);
 	
     OSTaskCreate((OS_TCB     *)&AppTaskStartTCB,            //Create the start task                               
                  (CPU_CHAR   *)"App Task Start",
